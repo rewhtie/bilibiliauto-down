@@ -1,28 +1,23 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, type ReactNode } from 'react';
+import dynamic from 'next/dynamic';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
 
-import { toast } from 'sonner';
+import { toast } from '@/lib/deferred-toast';
 import { Loader2, HelpCircle, Menu, Github } from 'lucide-react';
-import axios from 'axios';
-import type { Dictionary } from '@/lib/i18n/types';
+import type { HomeDictionary } from '@/lib/i18n/types';
 import type { Locale } from "@/lib/i18n/config";
-import { LanguageSwitcher } from "@/components/language-switcher";
+import { DeferredLanguageSwitcher } from "@/components/deferred-language-switcher";
+import { DeferredFeedbackDialog } from '@/components/deferred-feedback-dialog';
+import { DeferredChangelogDialog } from '@/components/deferred-changelog-dialog';
 import { API_ENDPOINTS } from '@/lib/config';
 
-import { DownloadHistory, type DownloadRecord } from './download-history';
-import { ResultCard } from '@/components/downloader/ResultCard';
-import { QuickStartCard } from '@/components/downloader/QuickStartCard';
-import { PlatformGuideCard } from '@/components/downloader/PlatformGuideCard';
-import { FreeSupportCard } from '@/components/downloader/FreeSupportCard';
-import { SideRailAd } from '@/components/ads/side-rail-ad';
-import { ChangelogDialog } from '@/components/changelog-dialog';
-import { FeedbackDialog } from '@/components/feedback-dialog';
-import { useLocalStorageState } from 'ahooks';
+import type { DownloadRecord } from './download-history';
+import { useLocalStorageState } from '@/hooks/use-local-storage-state';
 import type { UnifiedParseResult } from '@/lib/types';
 import { Platform } from '@/lib/types';
 import { DOWNLOAD_HISTORY_MAX_COUNT, DOWNLOAD_HISTORY_STORAGE_KEY } from '@/lib/constants';
@@ -34,42 +29,70 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 
+const DownloadHistory = dynamic(
+    () => import('./download-history').then((m) => m.DownloadHistory),
+    { ssr: false }
+);
+const ResultCard = dynamic(
+    () => import('@/components/downloader/ResultCard').then((m) => m.ResultCard),
+    { ssr: false }
+);
+
 interface UnifiedDownloaderProps {
-    dict: Dictionary;
+    dict: HomeDictionary;
     locale: Locale;
+    leftRail?: ReactNode;
+    rightRail?: ReactNode;
+    mobileAd?: ReactNode;
+    mobileGuides?: ReactNode;
+    heroMeta?: ReactNode;
+    footer?: ReactNode;
 }
 
-export function UnifiedDownloader({ dict, locale }: UnifiedDownloaderProps) {
+type UnifiedParseSuccessResult = UnifiedParseResult & {
+    success: true;
+    data: NonNullable<UnifiedParseResult['data']>;
+};
+
+async function requestUnifiedParse(videoUrl: string): Promise<UnifiedParseSuccessResult> {
+    const response = await fetch(`${API_ENDPOINTS.unified.parse}?url=${encodeURIComponent(videoUrl)}`, {
+        method: 'GET',
+        cache: 'no-store',
+    });
+
+    let payload: UnifiedParseResult | null = null;
+    try {
+        payload = await response.json() as UnifiedParseResult;
+    } catch {
+        throw new Error('');
+    }
+
+    if (!response.ok || !payload?.success || !payload.data) {
+        throw new Error(payload?.error || '');
+    }
+
+    return payload as UnifiedParseSuccessResult;
+}
+
+export function UnifiedDownloader({
+    dict,
+    locale,
+    leftRail,
+    rightRail,
+    mobileAd,
+    mobileGuides,
+    heroMeta,
+    footer,
+}: UnifiedDownloaderProps) {
     const [url, setUrl] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [parseResult, setParseResult] = useState<UnifiedParseResult['data'] | null>(null);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [isDesktopViewport, setIsDesktopViewport] = useState<boolean | null>(null);
 
     const [downloadHistory, setDownloadHistory] = useLocalStorageState<DownloadRecord[]>(DOWNLOAD_HISTORY_STORAGE_KEY, {
         defaultValue: []
     });
-    const seoCopy = locale === 'en'
-        ? {
-            trustLabel: 'Trust & Policies',
-            privacyLabel: 'Privacy Policy',
-            termsLabel: 'Terms of Use',
-            contactLabel: 'Contact',
-        }
-        : locale === 'zh-tw'
-          ? {
-              trustLabel: '信任與政策',
-              privacyLabel: '隱私政策',
-              termsLabel: '使用條款',
-              contactLabel: '聯絡我們',
-          }
-          : {
-              trustLabel: '信任与政策',
-              privacyLabel: '隐私政策',
-              termsLabel: '使用条款',
-              contactLabel: '联系我们',
-          };
     const addToHistory = (record: DownloadRecord) => {
         setDownloadHistory(prev => [record, ...(prev || []).slice(0, DOWNLOAD_HISTORY_MAX_COUNT - 1)]);
     };
@@ -78,38 +101,44 @@ export function UnifiedDownloader({ dict, locale }: UnifiedDownloaderProps) {
         setDownloadHistory([]);
     };
 
+    const getPlatformLabel = (platform: string): string => {
+        switch (platform) {
+            case 'bili':
+            case 'bilibili':
+                return dict.history.platforms.bilibili;
+            case 'douyin':
+                return dict.history.platforms.douyin;
+            case 'xiaohongshu':
+                return dict.history.platforms.xiaohongshu;
+            default:
+                return dict.history.platforms.unknown;
+        }
+    };
+
     // 统一解析处理：只解析不自动下载
     const handleUnifiedParse = async (videoUrl: string) => {
         // 调用解析接口获取视频信息
-        const parseResponse = await axios.get(`${API_ENDPOINTS.unified.parse}?url=${encodeURIComponent(videoUrl)}`);
-
-        if (!parseResponse.data || !parseResponse.data.success) {
-            throw new Error(parseResponse.data?.error || 'Failed to parse video');
-        }
-
-        const apiResult: UnifiedParseResult = parseResponse.data;
-
-        if (!apiResult.data) {
-            throw new Error('No data returned from parse API');
-        }
+        const apiResult = await requestUnifiedParse(videoUrl);
+        const platformCode = apiResult.data.platform;
+        const platformLabel = getPlatformLabel(platformCode);
 
         // 直接保存完整 parseResult.data，便于 ResultCard 渲染所有字段
         setParseResult(apiResult.data);
 
         // 添加到下载历史 - 如果没有 title，使用 desc
         // 使用 API 返回的规范 URL，避免口令等原始输入无法跳转
-        const displayTitle = apiResult.data.title || apiResult.data.desc || 'Unknown Title';
+        const displayTitle = apiResult.data.title || apiResult.data.desc || dict.history.unknownTitle;
         const newRecord: DownloadRecord = {
             url: apiResult.data.url || videoUrl,
             title: displayTitle,
             timestamp: Date.now(),
-            platform: apiResult.data.platform as Platform
+            platform: platformCode as Platform
         };
         addToHistory(newRecord);
 
         // 显示成功提示
         toast.success(dict.toast.douyinParseSuccess, {
-            description: `${apiResult.data.platform}: ${displayTitle}`,
+            description: `${platformLabel}: ${displayTitle}`,
         });
     };
 
@@ -135,9 +164,7 @@ export function UnifiedDownloader({ dict, locale }: UnifiedDownloaderProps) {
 
             setUrl('');
         } catch (err) {
-            const errorMessage = axios.isAxiosError(err)
-                ? (err.response?.data?.error || dict.errors.getVideoInfoFailed)
-                : (err instanceof Error ? err.message : dict.errors.downloadError);
+            const errorMessage = err instanceof Error && err.message ? err.message : dict.errors.downloadError;
             setError(errorMessage);
             toast.error(dict.errors.downloadFailed, {
                 description: errorMessage
@@ -155,18 +182,6 @@ export function UnifiedDownloader({ dict, locale }: UnifiedDownloaderProps) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    useEffect(() => {
-        const mediaQuery = window.matchMedia('(min-width: 1024px)');
-        const updateViewport = () => setIsDesktopViewport(mediaQuery.matches);
-
-        updateViewport();
-        mediaQuery.addEventListener('change', updateViewport);
-
-        return () => {
-            mediaQuery.removeEventListener('change', updateViewport);
-        };
-    }, []);
-
     return (
         <div className="min-h-screen flex flex-col bg-background">
             <div
@@ -176,12 +191,13 @@ export function UnifiedDownloader({ dict, locale }: UnifiedDownloaderProps) {
                 <div className="md:hidden max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-2">
                     <Link
                         href={`/${locale}`}
+                        prefetch={false}
                         className="max-w-[56vw] truncate text-sm font-medium"
                     >
                         {dict.unified.pageTitle}
                     </Link>
                     <div className="flex items-center gap-1">
-                        <LanguageSwitcher currentLocale={locale} dict={dict} compact />
+                        <DeferredLanguageSwitcher currentLocale={locale} dict={dict} compact />
                         <Dialog open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                             <DialogTrigger asChild>
                                 <Button variant="ghost" size="icon" aria-label={dict.page.openMenuLabel}>
@@ -200,17 +216,17 @@ export function UnifiedDownloader({ dict, locale }: UnifiedDownloaderProps) {
                                         </a>
                                     </Button>
                                     <Button variant="outline" className="w-full justify-start" asChild>
-                                        <Link href={`/${locale}/faq`} onClick={() => setMobileMenuOpen(false)}>
+                                        <Link href={`/${locale}/faq`} prefetch={false} onClick={() => setMobileMenuOpen(false)}>
                                             <HelpCircle className="h-4 w-4" />
                                             <span>{dict.page.faqLinkText}</span>
                                         </Link>
                                     </Button>
-                                    <FeedbackDialog
+                                    <DeferredFeedbackDialog
                                         locale={locale}
                                         dict={dict}
                                         triggerClassName="w-full justify-start"
                                     />
-                                    <ChangelogDialog
+                                    <DeferredChangelogDialog
                                         locale={locale}
                                         dict={dict}
                                         triggerClassName="w-full justify-start"
@@ -228,14 +244,14 @@ export function UnifiedDownloader({ dict, locale }: UnifiedDownloaderProps) {
                         </a>
                     </Button>
                     <Button variant="ghost" size="sm" asChild>
-                        <Link href={`/${locale}/faq`} className="flex items-center gap-1">
+                        <Link href={`/${locale}/faq`} prefetch={false} className="flex items-center gap-1">
                             <HelpCircle className="h-4 w-4" />
                             <span>{dict.page.faqLinkText}</span>
                         </Link>
                     </Button>
-                    <FeedbackDialog locale={locale} dict={dict} />
-                    <ChangelogDialog locale={locale} dict={dict} />
-                    <LanguageSwitcher currentLocale={locale} dict={dict} />
+                    <DeferredFeedbackDialog locale={locale} dict={dict} />
+                    <DeferredChangelogDialog locale={locale} dict={dict} />
+                    <DeferredLanguageSwitcher currentLocale={locale} dict={dict} />
                 </div>
             </div>
 
@@ -246,9 +262,7 @@ export function UnifiedDownloader({ dict, locale }: UnifiedDownloaderProps) {
                         {/* 左栏：快速入门指南 (PC端显示，移动端隐藏) */}
                         <div className="hidden lg:block">
                             <div className="sticky top-20 flex flex-col gap-4">
-                                <QuickStartCard dict={dict} />
-                                <FreeSupportCard dict={dict} />
-                                {isDesktopViewport === true && <SideRailAd slot="1341604736" />}
+                                {leftRail}
                             </div>
                         </div>
 
@@ -265,18 +279,7 @@ export function UnifiedDownloader({ dict, locale }: UnifiedDownloaderProps) {
                                             {dict.unified.newBadge}
                                         </span>
                                     </p>
-
-                                    <p className="text-center text-xs text-muted-foreground ">
-                                        {dict.page.feedback}
-                                        <a
-                                            href="https://github.com/lxw15337674/bilibili-audio-downloader/issues/new"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="underline"
-                                        >
-                                            {dict.page.feedbackLinkText}
-                                        </a>
-                                    </p>
+                                    {heroMeta}
                                 </CardHeader>
                                 <CardContent className="p-4">
                                     <form onSubmit={handleSubmit} className="space-y-6">
@@ -328,76 +331,41 @@ export function UnifiedDownloader({ dict, locale }: UnifiedDownloaderProps) {
                                 </CardContent>
                             </Card>
 
-                            <ResultCard
-                                result={parseResult}
+                            {parseResult && (
+                                <ResultCard
+                                    result={parseResult}
                                     onClose={closeParseResult}
                                     dict={dict}
-                            />
-
-                            {isDesktopViewport === false && (
-                                <div className="lg:hidden">
-                                    <SideRailAd slot="5740014745" className="h-full" />
-                                </div>
+                                />
                             )}
 
+                            {mobileAd && <div className="lg:hidden">{mobileAd}</div>}
+
                             {/* 历史记录 */}
-                            <DownloadHistory
-                                dict={dict}
-                                downloadHistory={downloadHistory || []}
-                                clearHistory={clearDownloadHistory}
-                                onRedownload={handleRedownload}
-                            />
+                            {downloadHistory.length > 0 && (
+                                <DownloadHistory
+                                    dict={dict}
+                                    downloadHistory={downloadHistory}
+                                    clearHistory={clearDownloadHistory}
+                                    onRedownload={handleRedownload}
+                                />
+                            )}
 
                             {/* 移动端帮助卡片 - 放在历史记录下方 */}
-                            <div className="lg:hidden flex flex-col gap-4">
-                                <QuickStartCard dict={dict} />
-                                <FreeSupportCard dict={dict} />
-                                <PlatformGuideCard dict={dict} />
-                            </div>
+                            {mobileGuides && <div className="lg:hidden flex flex-col gap-4">{mobileGuides}</div>}
                         </div>
 
                         {/* 右栏：平台支持指南 (PC端显示，移动端隐藏) */}
                         <div className="hidden lg:block">
                             <div className="sticky top-20 flex flex-col gap-4">
-                                <PlatformGuideCard dict={dict} />
-                                {isDesktopViewport === true && <SideRailAd slot="6380909506" />}
+                                {rightRail}
                             </div>
                         </div>
                     </div>
                 </div>
             </main>
 
-            {/* 页面底部版权说明 */}
-            <footer className="border-t bg-muted/30 py-6 mt-8">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                    <div className="text-center text-xs text-muted-foreground space-y-1">
-                        <p className="text-yellow-600 font-medium">{dict.page.copyrightBilibiliRestriction}</p>
-                        <p>
-                            <Link className="underline" href={`/${locale}/faq`}>
-                                {dict.page.faqLinkText}
-                            </Link>
-                        </p>
-                        <p>
-                            {seoCopy.trustLabel}
-                            {': '}
-                            <Link className="underline" href={`/${locale}/privacy`}>
-                                {seoCopy.privacyLabel}
-                            </Link>
-                            {' · '}
-                            <Link className="underline" href={`/${locale}/terms`}>
-                                {seoCopy.termsLabel}
-                            </Link>
-                            {' · '}
-                            <Link className="underline" href={`/${locale}/contact`}>
-                                {seoCopy.contactLabel}
-                            </Link>
-                        </p>
-                        <p>{dict.page.copyrightVideo}</p>
-                        <p>{dict.page.copyrightStorage}</p>
-                        <p>{dict.page.copyrightYear}</p>
-                    </div>
-                </div>
-            </footer>
+            {footer}
         </div>
     );
 } 

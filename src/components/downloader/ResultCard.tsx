@@ -1,20 +1,34 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, X, Download, Loader2, Package } from 'lucide-react';
+import dynamic from 'next/dynamic';
+import { X, Download, Loader2, Package } from 'lucide-react';
 import Image from "next/image";
-import type { Dictionary } from '@/lib/i18n/types';
+import type { HomeDictionary } from '@/lib/i18n/types';
 import { UnifiedParseResult, PageInfo } from "../../lib/types";
 import { downloadFile, formatDuration, sanitizeFilename } from "../../lib/utils";
-import { ExtractAudioButton } from "./ExtractAudioButton";
 import { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-import JSZip from 'jszip';
-import { toast } from 'sonner';
+import { toast } from '@/lib/deferred-toast';
+
+const ExtractAudioButton = dynamic(
+    () => import("./ExtractAudioButton").then((m) => m.ExtractAudioButton),
+    { ssr: false }
+);
 
 interface ResultCardProps {
     result: UnifiedParseResult['data'] | null | undefined
     onClose: () => void;
-    dict: Dictionary;
+    dict: HomeDictionary;
+}
+
+function resolveCoverSrc(coverUrl: string): string {
+    if (coverUrl.startsWith('http://') || coverUrl.startsWith('https://')) {
+        return `/api/proxy-image?url=${encodeURIComponent(coverUrl)}`;
+    }
+    return coverUrl;
+}
+
+function replaceTemplate(template: string, token: string, value: string): string {
+    return template.replace(token, value);
 }
 
 export function ResultCard({ result, onClose, dict }: ResultCardProps) {
@@ -22,6 +36,9 @@ export function ResultCard({ result, onClose, dict }: ResultCardProps) {
 
     const isMultiPart = result.isMultiPart && result.pages && result.pages.length > 1;
     const isImageNote = result.noteType === 'image' && !!result.images?.length;
+    const coverUrl = typeof result.cover === 'string' ? result.cover.trim() : '';
+    const shouldShowCover = !isImageNote && coverUrl.length > 0;
+    const coverSrc = shouldShowCover ? resolveCoverSrc(coverUrl) : '';
 
     const displayTitle = result.title;
     return (
@@ -42,6 +59,15 @@ export function ResultCard({ result, onClose, dict }: ResultCardProps) {
             </CardHeader>
             <CardContent className="px-4 py-2">
                 <div className="space-y-4">
+                    {shouldShowCover && (
+                        <ImageNoteGrid
+                            images={[coverSrc]}
+                            title={displayTitle}
+                            platform={result.platform}
+                            dict={dict}
+                            singleImageMode
+                        />
+                    )}
                     {isImageNote ? (
                         <ImageNoteGrid
                             images={result.images!}
@@ -67,7 +93,7 @@ export function ResultCard({ result, onClose, dict }: ResultCardProps) {
 /**
  * 单P视频的下载按钮
  */
-function SinglePartButtons({ result, dict }: { result: NonNullable<UnifiedParseResult['data']>; dict: Dictionary }) {
+function SinglePartButtons({ result, dict }: { result: NonNullable<UnifiedParseResult['data']>; dict: HomeDictionary }) {
     const showExtractAudio = result.platform === 'douyin' || result.platform === 'xiaohongshu';
 
     return (
@@ -109,11 +135,11 @@ function SinglePartButtons({ result, dict }: { result: NonNullable<UnifiedParseR
 /**
  * 多P视频的分P列表
  */
-function MultiPartList({ pages, currentPage, dict }: { pages: PageInfo[]; currentPage?: number; dict: Dictionary }) {
+function MultiPartList({ pages, currentPage, dict }: { pages: PageInfo[]; currentPage?: number; dict: HomeDictionary }) {
     return (
         <div className="space-y-2">
             <div className="text-sm text-muted-foreground">
-                {dict.result.totalParts?.replace('{count}', String(pages.length)) || `共 ${pages.length} 个分P`}
+                {replaceTemplate(dict.result.totalParts, '{count}', String(pages.length))}
             </div>
             <div className="max-h-[300px] overflow-y-auto space-y-2 pr-1">
                 {pages.map((page) => (
@@ -168,7 +194,19 @@ function MultiPartList({ pages, currentPage, dict }: { pages: PageInfo[]; curren
     );
 }
 
-function ImageNoteGrid({ images, title, platform, dict }: { images: string[]; title: string; platform: string; dict: Dictionary }) {
+function ImageNoteGrid({
+    images,
+    title,
+    platform,
+    dict,
+    singleImageMode = false,
+}: {
+    images: string[];
+    title: string;
+    platform: string;
+    dict: HomeDictionary;
+    singleImageMode?: boolean;
+}) {
     // 合并的状态类型
     type ImageLoadState = {
         loading: boolean;
@@ -199,17 +237,21 @@ function ImageNoteGrid({ images, title, platform, dict }: { images: string[]; ti
             await Promise.all(
                 images.map(async (imageUrl, index) => {
                     try {
-                        const refererMap: Record<string, string> = {
+                        const referrerMap: Record<string, string> = {
                             xiaohongshu: 'https://www.xiaohongshu.com/',
                             douyin: 'https://www.douyin.com/',
                         };
-                        const response = await axios.get(imageUrl, {
-                            responseType: 'blob',
-                            headers: {
-                                'Referer': refererMap[platform] ?? 'https://www.douyin.com/'
-                            }
-                        });
-                        const blobUrl = URL.createObjectURL(response.data);
+                        const referrer = referrerMap[platform];
+                        const shouldUseCustomReferrer =
+                            !!referrer &&
+                            (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'));
+
+                        const response = await fetch(imageUrl, shouldUseCustomReferrer ? { referrer } : undefined);
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}`);
+                        }
+                        const blob = await response.blob();
+                        const blobUrl = URL.createObjectURL(blob);
 
                         // 存储到 ref 用于清理
                         currentBlobUrls.add(blobUrl);
@@ -259,6 +301,7 @@ function ImageNoteGrid({ images, title, platform, dict }: { images: string[]; ti
         setPackagingProgress(0);
 
         try {
+            const { default: JSZip } = await import('jszip');
             const zip = new JSZip();
             let successCount = 0;
             let failCount = 0;
@@ -314,41 +357,43 @@ function ImageNoteGrid({ images, title, platform, dict }: { images: string[]; ti
 
     return (
         <div className="space-y-3">
-            <div className="flex items-center justify-between">
-                <div className="text-sm text-muted-foreground">
-                    <span className="inline-flex items-center gap-1">
-                        {dict.result.imageNote}
-                    </span>
-                    <span className="ml-2">
-                        {dict.result.imageCount?.replace('{count}', String(images.length)) || `共 ${images.length} 张图片`}
-                    </span>
-                    {!allLoaded && (
-                        <span className="ml-2 text-xs">
-                            ({dict.result.imageLoadingProgress.replace('{loaded}', String(loadedCount)).replace('{total}', String(images.length))})
+            {!singleImageMode && (
+                <div className="flex items-center justify-between">
+                    <div className="text-sm text-muted-foreground">
+                        <span className="inline-flex items-center gap-1">
+                            {dict.result.imageNote}
                         </span>
-                    )}
+                        <span className="ml-2">
+                            {replaceTemplate(dict.result.imageCount, '{count}', String(images.length))}
+                        </span>
+                        {!allLoaded && (
+                            <span className="ml-2 text-xs">
+                                ({dict.result.imageLoadingProgress.replace('{loaded}', String(loadedCount)).replace('{total}', String(images.length))})
+                            </span>
+                        )}
+                    </div>
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={!allLoaded || isPackaging || successCount === 0}
+                        onClick={handlePackageDownload}
+                        className="shrink-0"
+                    >
+                        {isPackaging ? (
+                            <>
+                                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                {dict.result.packaging} {packagingProgress}%
+                            </>
+                        ) : (
+                            <>
+                                <Package className="h-3 w-3 mr-1" />
+                                {dict.result.packageDownload}
+                            </>
+                        )}
+                    </Button>
                 </div>
-                <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={!allLoaded || isPackaging || successCount === 0}
-                    onClick={handlePackageDownload}
-                    className="shrink-0"
-                >
-                    {isPackaging ? (
-                        <>
-                            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                            {dict.result.packaging} {packagingProgress}%
-                        </>
-                    ) : (
-                        <>
-                            <Package className="h-3 w-3 mr-1" />
-                            {dict.result.packageDownload}
-                        </>
-                    )}
-                </Button>
-            </div>
-            <div className="grid grid-cols-2 gap-3 max-h-[500px] overflow-y-auto pr-1">
+            )}
+            <div className={`${singleImageMode ? 'grid grid-cols-1' : 'grid grid-cols-2'} gap-3 max-h-[500px] overflow-y-auto pr-1`}>
                 {images.map((imageUrl, index) => {
                     const state = imageStates.get(index);
                     const isLoading = state?.loading ?? true;
@@ -360,7 +405,7 @@ function ImageNoteGrid({ images, title, platform, dict }: { images: string[]; ti
                             key={index}
                             className="relative group border rounded-lg overflow-hidden bg-muted/30 hover:bg-muted/50 transition-colors"
                         >
-                            <div className="aspect-square relative bg-muted flex items-center justify-center">
+                            <div className={`${singleImageMode ? 'aspect-video' : 'aspect-square'} relative bg-muted flex items-center justify-center`}>
                                 {isLoading && (
                                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                                         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -370,17 +415,25 @@ function ImageNoteGrid({ images, title, platform, dict }: { images: string[]; ti
                                 {!isLoading && hasError && (
                                     <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground">
                                         <div className="text-2xl">🖼️</div>
-                                        <p className="text-xs mt-2">图片 #{index + 1}</p>
+                                        <p className="text-xs mt-2">
+                                            {singleImageMode
+                                                ? dict.result.coverLabel
+                                                : replaceTemplate(dict.result.imageIndexLabel, '{index}', String(index + 1))}
+                                        </p>
                                         <p className="text-[10px] mt-1 opacity-60">{dict.result.loadFailed}</p>
                                     </div>
                                 )}
                                 {!isLoading && !hasError && blobUrl && (
                                     <Image
                                         src={blobUrl}
-                                        alt={`Image ${index + 1}`}
+                                        alt={
+                                            singleImageMode
+                                                ? (title || dict.result.coverLabel)
+                                                : replaceTemplate(dict.result.imageAlt, '{index}', String(index + 1))
+                                        }
                                         fill
                                         unoptimized
-                                        sizes="(max-width: 768px) 50vw, 33vw"
+                                        sizes={singleImageMode ? '(max-width: 1024px) 100vw, 720px' : '(max-width: 768px) 50vw, 33vw'}
                                         className="object-cover"
                                     />
                                 )}
@@ -398,9 +451,11 @@ function ImageNoteGrid({ images, title, platform, dict }: { images: string[]; ti
                                     </Button>
                                 </div>
                             )}
-                            <div className="absolute top-1 right-1 bg-black/60 text-white text-xs px-2 py-0.5 rounded">
-                                {index + 1}
-                            </div>
+                            {!singleImageMode && (
+                                <div className="absolute top-1 right-1 bg-black/60 text-white text-xs px-2 py-0.5 rounded">
+                                    {index + 1}
+                                </div>
+                            )}
                         </div>
                     );
                 })}

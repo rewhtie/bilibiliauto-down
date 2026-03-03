@@ -20,9 +20,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { MessageSquare, Loader2, CheckCircle2 } from 'lucide-react'
-import { toast } from 'sonner'
+import { toast } from '@/lib/deferred-toast'
 import type { Locale } from '@/lib/i18n/config'
-import type { Dictionary } from '@/lib/i18n/types'
+import type { HomeDictionary } from '@/lib/i18n/types'
 import type { FeedbackType } from '@/lib/feedback-config'
 import { submitFeedback, validateContent, validateEmail } from '@/lib/feedback'
 import { FEEDBACK_CONFIG } from '@/lib/feedback-config'
@@ -30,14 +30,24 @@ import { cn } from '@/lib/utils'
 
 interface FeedbackDialogProps {
     locale: Locale
-    dict: Dictionary
+    dict: HomeDictionary
     triggerClassName?: string
     triggerIconOnly?: boolean
+    defaultOpen?: boolean
     onTriggerClick?: () => void
 }
 
-export function FeedbackDialog({ locale, dict, triggerClassName, triggerIconOnly = false, onTriggerClick }: FeedbackDialogProps) {
-    const [open, setOpen] = useState(false)
+export function FeedbackDialog({
+    locale,
+    dict,
+    triggerClassName,
+    triggerIconOnly = false,
+    defaultOpen = false,
+    onTriggerClick,
+}: FeedbackDialogProps) {
+    void locale
+    const feedback = dict.feedback
+    const [open, setOpen] = useState(defaultOpen)
     const [feedbackType, setFeedbackType] = useState<FeedbackType>('bug')
     const [content, setContent] = useState('')
     const [email, setEmail] = useState('')
@@ -52,11 +62,14 @@ export function FeedbackDialog({ locale, dict, triggerClassName, triggerIconOnly
     const contentError = content ? validateContent(content) : null
     const emailError = email ? !validateEmail(email) : null
     const canSubmit = !contentError && !emailError && content.trim().length >= FEEDBACK_CONFIG.validation.contentMinLength && validateEmail(email)
+    const contentTooShortMessage = feedback.contentTooShort.replace('{min}', String(FEEDBACK_CONFIG.validation.contentMinLength))
+    const contentCounterText = feedback.contentCounter
+        .replace('{current}', String(contentLength))
+        .replace('{max}', String(maxLength))
 
     // 获取当前反馈类型对应的placeholder
     const getPlaceholder = () => {
-        if (!dict.feedback?.contentPlaceholder) return ''
-        return dict.feedback.contentPlaceholder[feedbackType] || dict.feedback.contentPlaceholder.other || ''
+        return feedback.contentPlaceholder[feedbackType] || feedback.contentPlaceholder.other || ''
     }
 
     // 重置表单
@@ -92,7 +105,7 @@ export function FeedbackDialog({ locale, dict, triggerClassName, triggerIconOnly
 
             if (result.success) {
                 setSubmitStatus('success')
-                toast.success(dict.feedback?.toastSuccess || '反馈提交成功！')
+                toast.success(feedback.toastSuccess)
 
                 // 3秒后自动关闭
                 setTimeout(() => {
@@ -100,12 +113,12 @@ export function FeedbackDialog({ locale, dict, triggerClassName, triggerIconOnly
                 }, 3000)
             } else {
                 setSubmitStatus('error')
-                toast.error(dict.feedback?.toastError || '提交失败，请重试')
+                toast.error(feedback.toastError)
             }
         } catch (error) {
             console.error('Submit error:', error)
             setSubmitStatus('error')
-            toast.error(dict.feedback?.toastError || '提交失败，请重试')
+            toast.error(feedback.toastError)
         } finally {
             setIsSubmitting(false)
         }
@@ -119,19 +132,19 @@ export function FeedbackDialog({ locale, dict, triggerClassName, triggerIconOnly
             </div>
             <div className="space-y-2">
                 <h3 className="text-lg font-semibold">
-                    {dict.feedback?.successTitle || '提交成功！'}
+                    {feedback.successTitle}
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                    {dict.feedback?.successMessage || '感谢你的反馈！我们会认真查看每一条建议。'}
+                    {feedback.successMessage}
                 </p>
                 {email && (
                     <p className="text-xs text-muted-foreground">
-                        {dict.feedback?.successNote || '如果你留了邮箱，我们可能会联系你了解更多细节。'}
+                        {feedback.successNote}
                     </p>
                 )}
             </div>
             <Button onClick={() => setOpen(false)} className="mt-4">
-                {dict.feedback?.closeButton || '关闭'}
+                {feedback.closeButton}
             </Button>
         </div>
     )
@@ -142,7 +155,7 @@ export function FeedbackDialog({ locale, dict, triggerClassName, triggerIconOnly
             {/* 反馈类型 */}
             <div className="space-y-2">
                 <Label htmlFor="feedback-type">
-                    {dict.feedback?.typeLabel || '反馈类型'} <span className="text-red-500">*</span>
+                    {feedback.typeLabel} <span className="text-red-500">*</span>
                 </Label>
                 <Select value={feedbackType} onValueChange={(value) => setFeedbackType(value as FeedbackType)}>
                     <SelectTrigger id="feedback-type">
@@ -150,13 +163,13 @@ export function FeedbackDialog({ locale, dict, triggerClassName, triggerIconOnly
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="bug">
-                            {dict.feedback?.types?.bug || '🐛 Bug反馈'}
+                            {feedback.types.bug}
                         </SelectItem>
                         <SelectItem value="feature">
-                            {dict.feedback?.types?.feature || '💡 功能建议'}
+                            {feedback.types.feature}
                         </SelectItem>
                         <SelectItem value="other">
-                            {dict.feedback?.types?.other || '💬 其他反馈'}
+                            {feedback.types.other}
                         </SelectItem>
                     </SelectContent>
                 </Select>
@@ -165,7 +178,7 @@ export function FeedbackDialog({ locale, dict, triggerClassName, triggerIconOnly
             {/* 详细描述 */}
             <div className="space-y-2">
                 <Label htmlFor="feedback-content">
-                    {dict.feedback?.contentLabel || '详细描述'} <span className="text-red-500">*</span>
+                    {feedback.contentLabel} <span className="text-red-500">*</span>
                 </Label>
                 <Textarea
                     id="feedback-content"
@@ -178,11 +191,11 @@ export function FeedbackDialog({ locale, dict, triggerClassName, triggerIconOnly
                 />
                 <div className="flex justify-between items-center text-xs">
                     <span className={contentError ? 'text-red-500' : 'text-muted-foreground'}>
-                        {contentError === 'contentRequired' && (dict.feedback?.contentRequired || '请填写详细描述')}
-                        {contentError === 'contentTooShort' && `至少需要 ${FEEDBACK_CONFIG.validation.contentMinLength} 个字符`}
+                        {contentError === 'contentRequired' && feedback.contentRequired}
+                        {contentError === 'contentTooShort' && contentTooShortMessage}
                     </span>
                     <span className={contentLength > maxLength * 0.9 ? 'text-yellow-500' : 'text-muted-foreground'}>
-                        {contentLength} / {maxLength}
+                        {contentCounterText}
                     </span>
                 </div>
             </div>
@@ -190,23 +203,23 @@ export function FeedbackDialog({ locale, dict, triggerClassName, triggerIconOnly
             {/* 联系邮箱 */}
             <div className="space-y-2">
                 <Label htmlFor="feedback-email">
-                    {dict.feedback?.emailLabel || '联系邮箱'} <span className="text-red-500">*</span>
+                    {feedback.emailLabel} <span className="text-red-500">*</span>
                 </Label>
                 <Input
                     id="feedback-email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder={dict.feedback?.emailPlaceholder || 'your@email.com'}
+                    placeholder={feedback.emailPlaceholder}
                 />
                 {emailError && (
                     <p className="text-xs text-red-500">
-                        {dict.feedback?.emailInvalid || '邮箱格式不正确'}
+                        {feedback.emailInvalid}
                     </p>
                 )}
                 {!email && (
                     <p className="text-xs text-muted-foreground">
-                        {dict.feedback?.emailRequired || '请填写邮箱，以便我们回复你'}
+                        {feedback.emailRequired}
                     </p>
                 )}
             </div>
@@ -218,7 +231,7 @@ export function FeedbackDialog({ locale, dict, triggerClassName, triggerIconOnly
                     onClick={() => setOpen(false)}
                     disabled={isSubmitting}
                 >
-                    {dict.feedback?.cancelButton || '取消'}
+                    {feedback.cancelButton}
                 </Button>
                 <Button
                     onClick={handleSubmit}
@@ -227,10 +240,10 @@ export function FeedbackDialog({ locale, dict, triggerClassName, triggerIconOnly
                     {isSubmitting ? (
                         <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            {dict.feedback?.submittingButton || '提交中...'}
+                            {feedback.submittingButton}
                         </>
                     ) : (
-                        dict.feedback?.submitButton || '提交反馈'
+                        feedback.submitButton
                     )}
                 </Button>
             </div>
@@ -245,20 +258,20 @@ export function FeedbackDialog({ locale, dict, triggerClassName, triggerIconOnly
                     size={triggerIconOnly ? 'icon' : 'sm'}
                     className={cn('text-sm', triggerClassName)}
                     onClick={onTriggerClick}
-                    aria-label={dict.feedback?.triggerButton || '反馈'}
+                    aria-label={feedback.triggerButton}
                 >
                     <MessageSquare className={cn('h-4 w-4', !triggerIconOnly && 'mr-1')} />
                     {triggerIconOnly ? (
-                        <span className="sr-only">{dict.feedback?.triggerButton || '反馈'}</span>
+                        <span className="sr-only">{feedback.triggerButton}</span>
                     ) : (
-                        dict.feedback?.triggerButton || '反馈'
+                        feedback.triggerButton
                     )}
                 </Button>
             </DialogTrigger>
             <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>
-                        {dict.feedback?.title || '反馈与建议'}
+                        {feedback.title}
                     </DialogTitle>
                 </DialogHeader>
                 {submitStatus === 'success' ? renderSuccess() : renderForm()}

@@ -4,6 +4,23 @@ import { i18n } from "./src/lib/i18n/config";
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:8080';
 
 const nextConfig: NextConfig = {
+    cacheComponents: true,
+    reactCompiler: true,
+    experimental: {
+        optimizePackageImports: [
+            'lucide-react',
+            'sonner',
+            '@radix-ui/react-collapsible',
+            '@radix-ui/react-dialog',
+            '@radix-ui/react-label',
+            '@radix-ui/react-progress',
+            '@radix-ui/react-scroll-area',
+            '@radix-ui/react-select',
+            '@radix-ui/react-slot',
+            '@radix-ui/react-toast',
+            '@radix-ui/react-tooltip',
+        ],
+    },
     async headers() {
         return [
             {

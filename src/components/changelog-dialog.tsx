@@ -12,27 +12,35 @@ import {
 import { ScrollText } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import type { Locale } from '@/lib/i18n/config'
-import type { Dictionary } from '@/lib/i18n/types'
+import type { HomeDictionary } from '@/lib/i18n/types'
 import changelogData from '@/lib/changelog.json'
 import { cn } from '@/lib/utils'
 
 interface ChangelogDialogProps {
     locale: Locale
-    dict: Dictionary
+    dict: HomeDictionary
     triggerClassName?: string
     triggerIconOnly?: boolean
+    defaultOpen?: boolean
     onTriggerClick?: () => void
 }
 
-export function ChangelogDialog({ locale, dict, triggerClassName, triggerIconOnly = false, onTriggerClick }: ChangelogDialogProps) {
-    const [open, setOpen] = useState(false)
+export function ChangelogDialog({
+    locale,
+    dict,
+    triggerClassName,
+    triggerIconOnly = false,
+    defaultOpen = false,
+    onTriggerClick,
+}: ChangelogDialogProps) {
+    const [open, setOpen] = useState(defaultOpen)
 
     // 获取当前语言的更新内容，如果没有则回退到英文
     const getChanges = (changes: Record<string, string[]>) => {
         return changes[locale] || changes['en'] || []
     }
 
-    const title = dict.changelog?.title || '更新日志'
+    const title = dict.changelog.title
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>

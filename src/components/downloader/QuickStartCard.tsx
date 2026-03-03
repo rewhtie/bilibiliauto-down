@@ -3,7 +3,7 @@ import { PlayCircle } from 'lucide-react';
 import type { Dictionary } from '@/lib/i18n/types';
 
 interface QuickStartCardProps {
-    dict: Dictionary;
+    dict: Pick<Dictionary, 'guide'>;
 }
 
 export function QuickStartCard({ dict }: QuickStartCardProps) {

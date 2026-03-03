@@ -3,8 +3,11 @@ export interface ResultDict {
     downloadVideo: string;
     downloadAudio: string;
     originDownloadVideo: string;
-    totalParts?: string;
+    totalParts: string;
     downloadImage: string;
+    coverLabel: string;
+    imageIndexLabel: string;
+    imageAlt: string;
     imageNote: string;
     imageCount: string;
     packaging: string;
@@ -66,6 +69,7 @@ export interface Dictionary {
         redownload: string;
         linkFilled: string;
         clickToRedownload: string;
+        unknownTitle: string;
         platforms: {
             bilibili: string;
             douyin: string;
@@ -241,10 +245,10 @@ export interface Dictionary {
         }>;
     };
     result: ResultDict;
-    changelog?: {
+    changelog: {
         title: string;
     };
-    feedback?: {
+    feedback: {
         title: string;
         triggerButton: string;
         typeLabel: string;
@@ -256,6 +260,7 @@ export interface Dictionary {
         };
         contentLabel: string;
         contentRequired: string;
+        contentTooShort: string;
         contentPlaceholder: {
             bug: string;
             feature: string;
@@ -282,3 +287,17 @@ export interface Dictionary {
         toastError: string;
     };
 } 
+
+export interface HomeDictionary {
+    unified: Dictionary['unified'];
+    page: Pick<Dictionary['page'], 'faqLinkText' | 'openMenuLabel'>;
+    form: Dictionary['form'];
+    errors: Dictionary['errors'];
+    history: Dictionary['history'];
+    toast: Dictionary['toast'];
+    languages: Dictionary['languages'];
+    result: Dictionary['result'];
+    extractAudio: Dictionary['extractAudio'];
+    feedback: Dictionary['feedback'];
+    changelog: Dictionary['changelog'];
+}

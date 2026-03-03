@@ -19,6 +19,7 @@ export interface UnifiedParseResult {
     data?: {
         title: string;
         desc?: string;
+        cover?: string | null;
         platform: string;
         downloadAudioUrl: string | null;
         downloadVideoUrl: string | null;

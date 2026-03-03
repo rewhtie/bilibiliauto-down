@@ -5,14 +5,15 @@ import { usePathname, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Globe, ChevronDown, Check } from 'lucide-react'
 import type { Locale } from '@/lib/i18n/config'
-import type { Dictionary } from '@/lib/i18n/types'
+import type { HomeDictionary } from '@/lib/i18n/types'
 import { LOCALE_COOKIE_NAME, LOCALE_COOKIE_MAX_AGE } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 
 interface LanguageSwitcherProps {
     currentLocale: Locale
-    dict: Dictionary
+    dict: HomeDictionary
     compact?: boolean
+    defaultOpen?: boolean
 }
 
 function setLocaleCookie(locale: Locale) {
@@ -20,8 +21,8 @@ function setLocaleCookie(locale: Locale) {
     document.cookie = `${LOCALE_COOKIE_NAME}=${locale}; path=/; max-age=${LOCALE_COOKIE_MAX_AGE}; SameSite=Lax${secureAttr}`
 }
 
-export function LanguageSwitcher({ currentLocale, dict, compact = false }: LanguageSwitcherProps) {
-    const [isOpen, setIsOpen] = useState(false)
+export function LanguageSwitcher({ currentLocale, dict, compact = false, defaultOpen = false }: LanguageSwitcherProps) {
+    const [isOpen, setIsOpen] = useState(defaultOpen)
     const pathname = usePathname()
     const router = useRouter()
     const dropdownRef = useRef<HTMLDivElement>(null)

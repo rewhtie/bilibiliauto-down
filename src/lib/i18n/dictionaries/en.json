@@ -48,6 +48,7 @@
         "redownload": "Re-parse",
         "linkFilled": "Link filled",
         "clickToRedownload": "Click parse button to start re-parsing",
+        "unknownTitle": "Unknown Title",
         "platforms": {
             "bilibili": "Bilibili",
             "douyin": "Douyin",
@@ -385,6 +386,9 @@
         "originDownloadVideo": "Backup Direct Link",
         "totalParts": "Total {count} parts",
         "downloadImage": "Download Image",
+        "coverLabel": "Cover",
+        "imageIndexLabel": "Image #{index}",
+        "imageAlt": "Image {index}",
         "imageNote": "Image Note",
         "imageCount": "Total {count} images",
         "packaging": "Packaging",
@@ -411,6 +415,7 @@
         },
         "contentLabel": "Details",
         "contentRequired": "Please provide details (at least 10 characters)",
+        "contentTooShort": "At least {min} characters are required",
         "contentPlaceholder": {
             "bug": "Please describe the issue, steps to reproduce, expected result...",
             "feature": "Please describe the feature you'd like to see...",

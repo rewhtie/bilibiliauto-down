@@ -8,4 +8,7 @@ const dictionaries = {
     en: () => import('./dictionaries/en.json').then((module) => module.default),
 }
 
-export const getDictionary = async (locale: Locale): Promise<Dictionary> => dictionaries?.[locale]?.() ?? dictionaries['en']() 
+export async function getDictionary(locale: Locale): Promise<Dictionary> {
+    'use cache'
+    return dictionaries?.[locale]?.() ?? dictionaries['en']()
+}

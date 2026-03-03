@@ -48,6 +48,7 @@
         "redownload": "重新解析",
         "linkFilled": "链接已填入",
         "clickToRedownload": "点击解析按钮开始重新解析",
+        "unknownTitle": "未知标题",
         "platforms": {
             "bilibili": "哔哩哔哩",
             "douyin": "抖音",
@@ -386,6 +387,9 @@
         "originDownloadVideo": "备用直链",
         "totalParts": "共 {count} 个分P",
         "downloadImage": "下载图片",
+        "coverLabel": "封面",
+        "imageIndexLabel": "图片 #{index}",
+        "imageAlt": "图片 {index}",
         "imageNote": "图文笔记",
         "imageCount": "共 {count} 张图片",
         "packaging": "打包中",
@@ -412,6 +416,7 @@
         },
         "contentLabel": "详细描述",
         "contentRequired": "请填写详细描述（至少10个字符）",
+        "contentTooShort": "至少需要 {min} 个字符",
         "contentPlaceholder": {
             "bug": "请描述遇到的问题、复现步骤、期望结果等...",
             "feature": "请描述你期望的新功能或改进建议...",

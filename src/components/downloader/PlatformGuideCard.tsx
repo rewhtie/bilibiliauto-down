@@ -3,7 +3,7 @@ import { Globe } from 'lucide-react';
 import type { Dictionary } from '@/lib/i18n/types';
 
 interface PlatformGuideCardProps {
-    dict: Dictionary;
+    dict: Pick<Dictionary, 'guide'>;
 }
 
 export function PlatformGuideCard({ dict }: PlatformGuideCardProps) {

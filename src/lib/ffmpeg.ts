@@ -1,6 +1,5 @@
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { toBlobURL } from '@ffmpeg/util';
-import axios from 'axios';
 
 let ffmpegInstance: FFmpeg | null = null;
 let loadPromise: Promise<FFmpeg> | null = null;
@@ -68,6 +67,57 @@ export interface ExtractAudioOptions {
   onProgress?: (progress: number, stage: ExtractStage, info?: ProgressInfo) => void;
 }
 
+async function downloadVideoData(
+  videoUrl: string,
+  onProgress?: (progress: number, stage: ExtractStage, info?: ProgressInfo) => void
+): Promise<Uint8Array> {
+  const response = await fetch(videoUrl, {
+    method: 'GET',
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+  }
+
+  const total = Number(response.headers.get('content-length') || '0');
+
+  if (!response.body) {
+    const fallbackData = new Uint8Array(await response.arrayBuffer());
+    onProgress?.(100, 'downloading', { loaded: fallbackData.byteLength, total });
+    return fallbackData;
+  }
+
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let loaded = 0;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (!value) continue;
+
+    chunks.push(value);
+    loaded += value.byteLength;
+
+    const percentCompleted = total > 0 ? Math.round((loaded * 100) / total) : 0;
+    onProgress?.(percentCompleted, 'downloading', {
+      loaded,
+      total,
+    });
+  }
+
+  const combined = new Uint8Array(loaded);
+  let offset = 0;
+  for (const chunk of chunks) {
+    combined.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+
+  onProgress?.(100, 'downloading', { loaded, total });
+  return combined;
+}
+
 export async function extractAudioFromVideo({
   videoUrl,
   onProgress,
@@ -83,21 +133,7 @@ export async function extractAudioFromVideo({
 
   let videoData: Uint8Array;
   try {
-    const response = await axios.get(videoUrl, {
-      responseType: 'arraybuffer',
-      onDownloadProgress: (progressEvent) => {
-        const loaded = progressEvent.loaded;
-        const total = progressEvent.total || 0;
-        const percentCompleted = total > 0 ? Math.round((loaded * 100) / total) : 0;
-
-        onProgress?.(percentCompleted, 'downloading', {
-          loaded,
-          total
-        });
-      }
-    });
-
-    videoData = new Uint8Array(response.data);
+    videoData = await downloadVideoData(videoUrl, onProgress);
     console.log('[FFmpeg] Video downloaded, size:', videoData.byteLength);
   } catch (err) {
     throw new Error(`Failed to download video: ${err instanceof Error ? err.message : String(err)}`);

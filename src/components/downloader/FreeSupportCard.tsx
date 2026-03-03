@@ -3,7 +3,7 @@ import { Heart, Check, Shield, Info } from 'lucide-react';
 import type { Dictionary } from '@/lib/i18n/types';
 
 interface FreeSupportCardProps {
-    dict: Dictionary;
+    dict: Pick<Dictionary, 'freeSupport'>;
 }
 
 export function FreeSupportCard({ dict }: FreeSupportCardProps) {

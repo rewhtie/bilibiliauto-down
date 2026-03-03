@@ -3,11 +3,12 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "../globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "@/components/ui/sonner"
+import { DeferredAnalytics } from "@/components/deferred-analytics"
+import { DeferredToaster } from "@/components/deferred-toaster"
+import { DeferredWebVitalsTracker } from "@/components/deferred-web-vitals-tracker"
 import { getDictionary } from "@/lib/i18n"
 import type { Locale } from "@/lib/i18n/config"
 import { i18n } from "@/lib/i18n/config"
-import { Analytics } from '@vercel/analytics/next';
 import {
     buildOpenGraphLocaleAlternates,
     IS_INDEXABLE,
@@ -142,8 +143,9 @@ export default async function RootLayout({
                 />
             </head>
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-                <Toaster />
-                <Analytics />
+                <DeferredToaster />
+                <DeferredAnalytics />
+                <DeferredWebVitalsTracker />
                 <ThemeProvider
                     attribute="class"
                     defaultTheme="dark"
@@ -153,12 +155,12 @@ export default async function RootLayout({
                     {children}
                 </ThemeProvider>
                 <Script
-                    strategy="afterInteractive"
+                    strategy="lazyOnload"
                     src="https://www.googletagmanager.com/gtag/js?id=G-0BEHLKM3W5"
                 />
                 <Script
                     id="google-analytics"
-                    strategy="afterInteractive"
+                    strategy="lazyOnload"
                 >
                     {`
                         window.dataLayer = window.dataLayer || [];

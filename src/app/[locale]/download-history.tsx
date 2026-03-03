@@ -5,11 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { format } from 'date-fns';
 import { ChevronsUpDown } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/deferred-toast';
 import { Platform } from '../../lib/types';
-import { Dictionary } from '../../lib/i18n/types';
+import type { HomeDictionary } from '../../lib/i18n/types';
 
 export interface DownloadRecord {
     url: string;
@@ -19,14 +18,27 @@ export interface DownloadRecord {
 }
 
 interface DownloadHistoryProps {
-    dict: Dictionary;
+    dict: HomeDictionary;
     downloadHistory: DownloadRecord[];
     clearHistory: () => void;
     onRedownload?: (url: string) => void;
 }
 
+const DATE_TIME_FORMATTER = new Intl.DateTimeFormat(undefined, {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+});
+
+function formatRecordTimestamp(timestamp: number): string {
+    return DATE_TIME_FORMATTER.format(new Date(timestamp)).replace(',', '');
+}
+
 // 获取平台标签样式
-const getPlatformBadge = (platform: Platform, dict: Dictionary) => {
+const getPlatformBadge = (platform: Platform, dict: HomeDictionary) => {
     switch (platform) {
         case 'bili':
         case 'bilibili':
@@ -111,7 +123,7 @@ export function DownloadHistory({ dict, downloadHistory, clearHistory, onRedownl
                                                         {platformBadge.text}
                                                     </span>
                                                     <span>
-                                                        {format(new Date(record.timestamp), 'yyyy-MM-dd HH:mm')}
+                                                        {formatRecordTimestamp(record.timestamp)}
                                                     </span>
                                                 </div>
                                             </div>

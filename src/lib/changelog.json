@@ -6,6 +6,7 @@
       "changes": {
         "zh": [
           "支持抖音图文帖展示与下载",
+          "支持视频封面显示和下载",
           "优化三栏布局断点至 1024px，更多设备可见侧栏",
           "移动端广告调整至解析结果下方，内容优先展示",
           "修复口令解析后历史记录查看原视频链接无效的问题",
@@ -13,6 +14,7 @@
         ],
         "en": [
           "Support Douyin image note display and download",
+          "Support video cover display and download",
           "Optimized three-column layout breakpoint to 1024px for wider device support",
           "Moved mobile ad below parse result, prioritizing content display",
           "Fixed 'View Original' link broken in history when input was a share token",
@@ -20,6 +22,7 @@
         ],
         "zh-tw": [
           "支援抖音圖文帖展示與下載",
+          "支援影片封面顯示與下載",
           "最佳化三欄布局斷點至 1024px，更多裝置可見側欄",
           "行動端廣告調整至解析結果下方，內容優先展示",
           "修復使用口令解析後歷史記錄查看原影片連結失效的問題",
