@@ -59,7 +59,6 @@ export default async function HomePage({
                         <ViewportSideRailAd slot="6380909506" showOn="desktop" />
                     </>
                 }
-                mobileAd={<ViewportSideRailAd slot="5740014745" showOn="mobile" className="h-full" />}
                 mobileGuides={
                     <>
                         <QuickStartCard dict={dict} />
