@@ -17,11 +17,6 @@ export async function getFFmpeg(): Promise<FFmpeg> {
   }
 
   loadPromise = (async () => {
-    // Check if SharedArrayBuffer is available
-    if (typeof SharedArrayBuffer === 'undefined') {
-      throw new Error('SharedArrayBuffer is not available. This may be due to missing COOP/COEP headers.');
-    }
-
     const ffmpeg = new FFmpeg();
 
     ffmpeg.on('log', ({ message }) => {
@@ -39,10 +34,13 @@ export async function getFFmpeg(): Promise<FFmpeg> {
         'application/wasm'
       );
 
-      await ffmpeg.load({
+      const loadConfig = {
         coreURL,
         wasmURL,
-      });
+      };
+
+      await ffmpeg.load(loadConfig);
+      console.log('[FFmpeg] Loaded single-thread core');
     } catch (err) {
       loadPromise = null;
       throw new Error(`Failed to load FFmpeg: ${err instanceof Error ? err.message : String(err)}`);
