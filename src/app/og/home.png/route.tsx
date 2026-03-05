@@ -26,7 +26,7 @@ export async function GET() {
                     Universal Media Downloader
                 </div>
                 <div style={{ marginTop: 20, fontSize: 34, color: '#CBD5E1' }}>
-                    Bilibili, Douyin, Xiaohongshu
+                    Bilibili, Douyin, Xiaohongshu, TikTok
                 </div>
                 <div style={{ marginTop: 20, fontSize: 28, color: '#94A3B8' }}>
                     Parse links, download videos, extract MP3 audio

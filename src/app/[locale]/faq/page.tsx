@@ -62,7 +62,6 @@ export default async function FaqPage({
 }) {
     const { locale } = await params
     const dict = await getDictionary(locale)
-    const guidesLabel = locale === "en" ? "Guides" : locale === "zh-tw" ? "下載指南" : "下载指南"
     const privacyLabel = locale === "en" ? "Privacy" : locale === "zh-tw" ? "隱私政策" : "隐私政策"
     const termsLabel = locale === "en" ? "Terms" : locale === "zh-tw" ? "使用條款" : "使用条款"
     const contactLabel = locale === "en" ? "Contact" : locale === "zh-tw" ? "聯絡我們" : "联系我们"
@@ -79,8 +78,8 @@ export default async function FaqPage({
                         {dict.faqPage.intro}
                     </p>
                     <p className="text-sm">
-                        <Link href={`/${locale}/guides`} className="underline">
-                            {guidesLabel}
+                        <Link href={`/${locale}`} className="underline">
+                            {homeLabel}
                         </Link>
                         {' · '}
                         <Link href={`/${locale}/privacy`} className="underline">

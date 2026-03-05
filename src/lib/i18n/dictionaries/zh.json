@@ -7,7 +7,7 @@
     },
     "unified": {
         "pageTitle": "社交媒体下载器",
-        "pageDescription": "粘贴链接或口令，自动识别并下载。支持 哔哩哔哩、抖音、小红书。",
+        "pageDescription": "粘贴链接或口令，自动识别并下载。支持 哔哩哔哩、抖音、小红书、TikTok。",
         "placeholder": "请在此处粘贴链接或口令...",
         "newBadge": "新增抖音图文支持"
     },
@@ -64,20 +64,20 @@
         "clickToRedownloadDesc": "点击解析按钮开始重新解析"
     },
     "metadata": {
-        "title": "通用媒体下载器 - 支持 哔哩哔哩、抖音、小红书视频音频下载",
-        "description": "免费在线通用媒体下载工具。支持 哔哩哔哩、抖音、小红书等平台的视频音频下载。支持哔哩哔哩音频提取转MP3、哔哩哔哩视频下载、抖音无水印视频下载、小红书图文笔记下载。一键粘贴链接，自动识别平台，高清无损下载。",
-        "keywords": "通用下载器,媒体下载器,哔哩哔哩下载,哔哩哔哩视频下载,哔哩哔哩音频提取,哔哩哔哩转MP3,抖音无水印下载,抖音视频下载,小红书视频下载,小红书图文下载,在线视频下载,视频转音频,免费在线下载工具",
+        "title": "通用媒体下载器 - 支持哔哩哔哩、抖音、小红书、TikTok视频音频下载",
+        "description": "免费在线通用媒体下载工具。支持 哔哩哔哩、抖音、小红书、TikTok等平台的视频音频下载。支持哔哩哔哩音频提取转MP3、哔哩哔哩视频下载、抖音无水印视频下载、小红书图文笔记下载、TikTok无水印视频下载。一键粘贴链接，自动识别平台，高清无损下载。",
+        "keywords": "通用下载器,媒体下载器,哔哩哔哩下载,哔哩哔哩视频下载,哔哩哔哩音频提取,哔哩哔哩转MP3,抖音无水印下载,抖音视频下载,小红书视频下载,小红书图文下载,TikTok无水印下载,TikTok视频下载,在线视频下载,视频转音频,免费在线下载工具",
         "ogTitle": "通用媒体下载器 - 免费在线工具",
-        "ogDescription": "专业的通用媒体下载工具。支持 哔哩哔哩、抖音、小红书等平台的视频音频下载，自动识别链接平台，一键高清下载。",
+        "ogDescription": "专业的通用媒体下载工具。支持 哔哩哔哩、抖音、小红书、TikTok等平台的视频音频下载，自动识别链接平台，一键高清下载。",
         "siteName": "通用媒体下载器"
     },
     "faqPage": {
-        "metaTitle": "视频下载常见问题｜支持哔哩哔哩、抖音、小红书",
-        "metaDescription": "关于哔哩哔哩、抖音、小红书视频下载的常见问题解答，包含无水印下载、链接格式、音频提取、清晰度与解析失败原因。",
-        "metaOgTitle": "视频下载常见问题｜支持哔哩哔哩、抖音、小红书",
-        "metaOgDescription": "关于哔哩哔哩、抖音、小红书视频下载的常见问题解答，包含无水印下载、链接格式、音频提取、清晰度与解析失败原因。",
-        "title": "视频下载常见问题（哔哩哔哩/抖音/小红书）",
-        "intro": "本工具支持哔哩哔哩、抖音、小红书视频下载与音频提取。粘贴链接即可自动识别平台并解析下载。",
+        "metaTitle": "视频下载常见问题｜支持哔哩哔哩、抖音、小红书、TikTok",
+        "metaDescription": "关于哔哩哔哩、抖音、小红书、TikTok视频下载的常见问题解答，包含无水印下载、链接格式、音频提取、清晰度与解析失败原因。",
+        "metaOgTitle": "视频下载常见问题｜支持哔哩哔哩、抖音、小红书、TikTok",
+        "metaOgDescription": "关于哔哩哔哩、抖音、小红书、TikTok视频下载的常见问题解答，包含无水印下载、链接格式、音频提取、清晰度与解析失败原因。",
+        "title": "视频下载常见问题（哔哩哔哩/抖音/小红书/TikTok）",
+        "intro": "本工具支持哔哩哔哩、抖音、小红书、TikTok视频下载与音频提取。粘贴链接即可自动识别平台并解析下载。",
         "questions": [
             {
                 "question": "哔哩哔哩视频下载怎么用？",
@@ -231,6 +231,7 @@
                 "Download Douyin videos without watermark",
                 "Download Xiaohongshu Image Notes",
                 "Download Xiaohongshu Videos",
+                "Download TikTok videos without watermark",
                 "Auto-detect video platform",
                 "High-quality audio and video downloads",
                 "Free online tool",
@@ -244,6 +245,7 @@
                 "下载小红书图文笔记",
                 "下载小红书无水印视频",
                 "提取小红书视频音频",
+                "下载TikTok无水印视频",
                 "自动识别视频平台",
                 "高清音频视频下载",
                 "免费在线工具",
@@ -257,6 +259,7 @@
                 "下载小红书图文笔记",
                 "下载小红书无水印视频",
                 "提取小红书视频音频",
+                "下载TikTok无水印视频",
                 "自动识别视频平台",
                 "高清音频视频下载",
                 "免费在线工具",
@@ -323,15 +326,15 @@
         },
         "howTo": {
             "title": {
-                "en": "How to download Bilibili, Douyin and Xiaohongshu content",
-                "zh": "如何下载哔哩哔哩、抖音及小红书内容",
-                "zh-tw": "如何下载哔哩哔哩、抖音及小红书内容"
+                "en": "How to download Bilibili, Douyin, Xiaohongshu and TikTok content",
+                "zh": "如何下载哔哩哔哩、抖音、小红书及TikTok内容",
+                "zh-tw": "如何下载哔哩哔哩、抖音、小红书及TikTok内容"
             },
             "steps": {
                 "en": [
                     {
                         "name": "Copy link",
-                        "text": "Copy the video or note link from Bilibili, Douyin or Xiaohongshu"
+                        "text": "Copy the video or note link from Bilibili, Douyin, Xiaohongshu, or TikTok"
                     },
                     {
                         "name": "Paste link",
@@ -339,7 +342,7 @@
                     },
                     {
                         "name": "Auto-detect",
-                        "text": "The tool will automatically detect the platform (Bilibili/Douyin/Xiaohongshu)"
+                        "text": "The tool will automatically detect the platform (Bilibili/Douyin/Xiaohongshu/TikTok)"
                     },
                     {
                         "name": "Download",
@@ -349,7 +352,7 @@
                 "zh": [
                     {
                         "name": "复制链接",
-                        "text": "从浏览器复制哔哩哔哩、抖音或小红书的视频/笔记链接"
+                        "text": "从浏览器复制哔哩哔哩、抖音、小红书或TikTok的视频/笔记链接"
                     },
                     {
                         "name": "粘贴链接",
@@ -357,7 +360,7 @@
                     },
                     {
                         "name": "自动识别",
-                        "text": "工具会自动识别平台（哔哩哔哩/抖音/小红书）"
+                        "text": "工具会自动识别平台（哔哩哔哩/抖音/小红书/TikTok）"
                     },
                     {
                         "name": "下载",
@@ -367,7 +370,7 @@
                 "zh-tw": [
                     {
                         "name": "复制链接",
-                        "text": "从浏览器复制哔哩哔哩、抖音或小红书的视频/笔记链接"
+                        "text": "从浏览器复制哔哩哔哩、抖音、小红书或TikTok的视频/笔记链接"
                     },
                     {
                         "name": "粘贴链接",
@@ -375,7 +378,7 @@
                     },
                     {
                         "name": "自动识别",
-                        "text": "工具会自动识别平台（哔哩哔哩/抖音/小红书）"
+                        "text": "工具会自动识别平台（哔哩哔哩/抖音/小红书/TikTok）"
                     },
                     {
                         "name": "下载",
@@ -448,7 +451,3 @@
         "toastError": "提交失败，请重试"
     }
 }
-
-
-
-

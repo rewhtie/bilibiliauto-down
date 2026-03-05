@@ -15,10 +15,14 @@ export async function generateMetadata({
     params: Promise<{ locale: Locale }>
 }): Promise<Metadata> {
     const { locale } = await params
-    const title = locale === "en" ? "Terms of Use" : locale === "zh-tw" ? "使用條款" : "使用条款"
+    const title = locale === "en"
+        ? "Terms of Use | Universal Media Downloader"
+        : locale === "zh-tw"
+          ? "使用條款｜通用媒體下載器"
+          : "使用条款｜通用媒体下载器"
     const siteName = locale === "en" ? "Universal Media Downloader" : locale === "zh-tw" ? "通用媒體下載器" : "通用媒体下载器"
     const description = locale === "en"
-        ? "Usage terms, legal limitations, and responsibilities for using the media downloader."
+        ? "Usage terms, legal limitations, and user responsibilities for Universal Media Downloader."
         : locale === "zh-tw"
           ? "說明下載工具的使用條件、限制與責任範圍。"
           : "说明下载工具的使用条件、限制与责任范围。"
@@ -71,6 +75,7 @@ export default async function TermsPage({
             linksLabel: "Related pages",
             privacy: "Privacy Policy",
             contact: "Contact",
+            faq: "FAQ",
         }
         : locale === "zh-tw"
           ? {
@@ -87,6 +92,7 @@ export default async function TermsPage({
               linksLabel: "相關頁面",
               privacy: "隱私政策",
               contact: "聯絡我們",
+              faq: "常見問題",
           }
           : {
               title: "使用条款",
@@ -102,6 +108,7 @@ export default async function TermsPage({
               linksLabel: "相关页面",
               privacy: "隐私政策",
               contact: "联系我们",
+              faq: "常见问题",
           }
 
     return (
@@ -123,6 +130,8 @@ export default async function TermsPage({
                     <Link className="underline" href={`/${locale}/privacy`}>{copy.privacy}</Link>
                     {' · '}
                     <Link className="underline" href={`/${locale}/contact`}>{copy.contact}</Link>
+                    {' · '}
+                    <Link className="underline" href={`/${locale}/faq`}>{copy.faq}</Link>
                 </p>
             </div>
             <PageStructuredData

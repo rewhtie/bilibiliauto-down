@@ -15,13 +15,17 @@ export async function generateMetadata({
     params: Promise<{ locale: Locale }>
 }): Promise<Metadata> {
     const { locale } = await params
-    const title = locale === "en" ? "Contact" : locale === "zh-tw" ? "聯絡我們" : "联系我们"
+    const title = locale === "en"
+        ? "Contact | Universal Media Downloader"
+        : locale === "zh-tw"
+          ? "聯絡我們｜通用媒體下載器"
+          : "联系我们｜通用媒体下载器"
     const siteName = locale === "en" ? "Universal Media Downloader" : locale === "zh-tw" ? "通用媒體下載器" : "通用媒体下载器"
     const description = locale === "en"
-        ? "Contact the Universal Media Downloader team for support, bug reports, or suggestions."
+        ? "Contact Universal Media Downloader for support, bug reports, feature requests, and SEO feedback."
         : locale === "zh-tw"
-          ? "聯絡下載工具團隊，提交問題回報或功能建議。"
-          : "联系下载工具团队，提交问题反馈或功能建议。"
+          ? "聯絡下載工具團隊，提交問題回報、功能建議或 SEO 反饋。"
+          : "联系下载工具团队，提交问题反馈、功能建议或 SEO 反馈。"
     const url = buildLocaleUrl(locale, "/contact")
 
     return {
@@ -111,6 +115,8 @@ export default async function ContactPage({
                 <p className="text-sm text-muted-foreground">
                     {copy.linksLabel}
                     {": "}
+                    <Link className="underline" href={`/${locale}`}>{copy.home}</Link>
+                    {' · '}
                     <Link className="underline" href={`/${locale}/privacy`}>{copy.privacy}</Link>
                     {' · '}
                     <Link className="underline" href={`/${locale}/terms`}>{copy.terms}</Link>

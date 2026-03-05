@@ -2,7 +2,6 @@ import { getDictionary } from "@/lib/i18n"
 import type { Locale } from "@/lib/i18n/config"
 import Link from "next/link"
 import { StructuredData } from "@/components/structured-data"
-import { HomeFaqStructuredData } from "@/components/home-faq-structured-data"
 import { UnifiedDownloaderClient } from "./unified-downloader-client"
 import { pickHomeDictionary } from "@/lib/i18n/home-dictionary"
 import { QuickStartCard } from "@/components/downloader/QuickStartCard"
@@ -42,7 +41,6 @@ export default async function HomePage({
     return (
         <>
             <StructuredData locale={locale} dict={dict} />
-            <HomeFaqStructuredData locale={locale} dict={dict} />
             <UnifiedDownloaderClient
                 dict={homeDict}
                 locale={locale}

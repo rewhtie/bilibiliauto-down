@@ -26,7 +26,7 @@ export async function GET() {
                     Video Download FAQ
                 </div>
                 <div style={{ marginTop: 22, fontSize: 34, color: '#CBD5E1' }}>
-                    Bilibili, Douyin, Xiaohongshu
+                    Bilibili, Douyin, Xiaohongshu, TikTok
                 </div>
                 <div style={{ marginTop: 18, fontSize: 28, color: '#94A3B8' }}>
                     Troubleshooting and usage answers

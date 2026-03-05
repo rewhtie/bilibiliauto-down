@@ -1,69 +1,34 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { match } from '@formatjs/intl-localematcher'
 import Negotiator from 'negotiator'
 import { i18n } from './lib/i18n/config'
-
-// Accept-Language 到 locale 的映射
-const localeMapping: Record<string, string> = {
-    'zh-TW': 'zh-tw',
-    'zh-HK': 'zh-tw',
-    'zh-MO': 'zh-tw',
-    'zh-Hant': 'zh-tw',
-    'zh-Hant-TW': 'zh-tw',
-    'zh-Hant-HK': 'zh-tw',
-    'zh-Hant-MO': 'zh-tw',
-    'zh-CN': 'zh',
-    'zh-Hans': 'zh',
-    'zh-Hans-CN': 'zh',
-    'zh': 'zh', // 默认简体
-}
+import {
+    isBotUserAgent,
+    normalizeCookieLocale,
+    resolveLocaleForRequest,
+} from './lib/seo-routing'
 
 function getLocaleFromCookie(request: NextRequest): string | null {
     const cookieLocale = request.cookies.get('preferred-locale')?.value
-    return cookieLocale && i18n.locales.includes(cookieLocale as (typeof i18n.locales)[number]) ? cookieLocale : null
+    return normalizeCookieLocale(cookieLocale ?? null, i18n.locales)
 }
 
-function getLocaleFromAcceptLanguage(request: NextRequest): string {
+function getAcceptedLanguages(request: NextRequest): string[] {
     const negotiatorHeaders: Record<string, string> = {}
     request.headers.forEach((value, key) => (negotiatorHeaders[key] = value))
 
-    const languages = new Negotiator({ headers: negotiatorHeaders }).languages()
-
-    // 先尝试精确匹配
-    for (const lang of languages) {
-        if (localeMapping[lang]) {
-            return localeMapping[lang]
-        }
-    }
-
-    // 再尝试使用 intl-localematcher
-    try {
-        return match(languages, i18n.locales, i18n.defaultLocale)
-    } catch {
-        return i18n.defaultLocale
-    }
+    return new Negotiator({ headers: negotiatorHeaders }).languages()
 }
 
 function getLocale(request: NextRequest): string {
-    // 首先检查 URL 中是否已有语言前缀
-    const pathname = request.nextUrl.pathname
-    const pathnameHasLocale = i18n.locales.some(
-        (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
-    )
-
-    if (pathnameHasLocale) {
-        return pathname.split('/')[1]
-    }
-
-    // 检查 Cookie 中的语言偏好
-    const cookieLocale = getLocaleFromCookie(request)
-    if (cookieLocale) {
-        return cookieLocale
-    }
-
-    // 从 Accept-Language header 获取首选语言
-    return getLocaleFromAcceptLanguage(request)
+    return resolveLocaleForRequest({
+        pathname: request.nextUrl.pathname,
+        userAgent: request.headers.get('user-agent') || '',
+        cookieLocale: getLocaleFromCookie(request),
+        acceptLanguages: getAcceptedLanguages(request),
+        locales: i18n.locales,
+        defaultLocale: i18n.defaultLocale,
+    })
 }
 
 export function proxy(request: NextRequest) {
@@ -91,8 +56,8 @@ export function proxy(request: NextRequest) {
 
     const response = NextResponse.redirect(request.nextUrl)
 
-    // 设置 Cookie 记住用户语言偏好（仅在基于浏览器检测时设置）
-    if (!getLocaleFromCookie(request)) {
+    // 设置 Cookie 记住用户语言偏好（仅在真实用户请求且非已有 cookie 时设置）
+    if (!isBotUserAgent(request.headers.get('user-agent') || '') && !getLocaleFromCookie(request)) {
         response.cookies.set('preferred-locale', locale, {
             path: '/',
             maxAge: 31536000, // 1年

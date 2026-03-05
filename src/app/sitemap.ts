@@ -1,20 +1,23 @@
 import { MetadataRoute } from 'next'
 import { i18n } from '@/lib/i18n/config'
 import { IS_INDEXABLE, buildLanguageAlternates, buildLocaleUrl } from '@/lib/seo'
+import { resolveSitemapLastModified } from '@/lib/seo-sitemap'
+
+const FALLBACK_LASTMOD = new Date()
 
 export default function sitemap(): MetadataRoute.Sitemap {
     if (!IS_INDEXABLE) {
         return []
     }
 
-    const staticContentLastModified = new Date('2026-02-18T00:00:00.000Z')
+    const lastModified = resolveSitemapLastModified(process.env, FALLBACK_LASTMOD)
 
     return i18n.locales.flatMap((locale) => {
         const localeBase = buildLocaleUrl(locale)
         return [
             {
                 url: localeBase,
-                lastModified: staticContentLastModified,
+                lastModified,
                 changeFrequency: 'monthly' as const,
                 priority: locale === i18n.defaultLocale ? 1.0 : 0.9,
                 alternates: {
@@ -23,7 +26,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
             },
             {
                 url: `${localeBase}/faq`,
-                lastModified: staticContentLastModified,
+                lastModified,
                 changeFrequency: 'monthly' as const,
                 priority: locale === i18n.defaultLocale ? 0.8 : 0.7,
                 alternates: {
@@ -32,7 +35,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
             },
             {
                 url: `${localeBase}/privacy`,
-                lastModified: staticContentLastModified,
+                lastModified,
                 changeFrequency: 'yearly' as const,
                 priority: locale === i18n.defaultLocale ? 0.5 : 0.4,
                 alternates: {
@@ -41,7 +44,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
             },
             {
                 url: `${localeBase}/terms`,
-                lastModified: staticContentLastModified,
+                lastModified,
                 changeFrequency: 'yearly' as const,
                 priority: locale === i18n.defaultLocale ? 0.5 : 0.4,
                 alternates: {
@@ -50,7 +53,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
             },
             {
                 url: `${localeBase}/contact`,
-                lastModified: staticContentLastModified,
+                lastModified,
                 changeFrequency: 'monthly' as const,
                 priority: locale === i18n.defaultLocale ? 0.55 : 0.45,
                 alternates: {

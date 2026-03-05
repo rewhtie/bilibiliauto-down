@@ -15,13 +15,17 @@ export async function generateMetadata({
     params: Promise<{ locale: Locale }>
 }): Promise<Metadata> {
     const { locale } = await params
-    const title = locale === "en" ? "Privacy Policy" : locale === "zh-tw" ? "隱私政策" : "隐私政策"
+    const title = locale === "en"
+        ? "Privacy Policy | Universal Media Downloader"
+        : locale === "zh-tw"
+          ? "隱私政策｜通用媒體下載器"
+          : "隐私政策｜通用媒体下载器"
     const siteName = locale === "en" ? "Universal Media Downloader" : locale === "zh-tw" ? "通用媒體下載器" : "通用媒体下载器"
     const description = locale === "en"
-        ? "How Universal Media Downloader handles data, browser storage, and user privacy."
+        ? "How Universal Media Downloader handles data, browser storage, analytics, and privacy protection."
         : locale === "zh-tw"
-          ? "說明本站如何處理資料、瀏覽器儲存與隱私保護。"
-          : "说明本站如何处理数据、浏览器存储与隐私保护。"
+          ? "說明本站如何處理資料、瀏覽器儲存、分析服務與隱私保護。"
+          : "说明本站如何处理数据、浏览器存储、分析服务与隐私保护。"
     const url = buildLocaleUrl(locale, "/privacy")
 
     return {
@@ -70,7 +74,8 @@ export default async function PrivacyPage({
             home: "Home",
             linksLabel: "Related pages",
             faq: "FAQ",
-            guides: "Guides",
+            terms: "Terms of Use",
+            contact: "Contact",
         }
         : locale === "zh-tw"
           ? {
@@ -86,6 +91,8 @@ export default async function PrivacyPage({
               home: "首頁",
               linksLabel: "相關頁面",
               faq: "常見問題",
+              terms: "使用條款",
+              contact: "聯絡我們",
           }
           : {
               title: "隐私政策",
@@ -100,6 +107,8 @@ export default async function PrivacyPage({
               home: "首页",
               linksLabel: "相关页面",
               faq: "常见问题",
+              terms: "使用条款",
+              contact: "联系我们",
           }
 
     return (
@@ -119,6 +128,10 @@ export default async function PrivacyPage({
                     {copy.linksLabel}
                     {": "}
                     <Link className="underline" href={`/${locale}/faq`}>{copy.faq}</Link>
+                    {' · '}
+                    <Link className="underline" href={`/${locale}/terms`}>{copy.terms}</Link>
+                    {' · '}
+                    <Link className="underline" href={`/${locale}/contact`}>{copy.contact}</Link>
                 </p>
             </div>
             <PageStructuredData

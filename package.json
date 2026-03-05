@@ -6,6 +6,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "test": "node --experimental-strip-types --experimental-specifier-resolution=node --test tests/seo-routing.test.ts tests/seo-sitemap.test.ts",
     "perf:report": "node scripts/perf-report.mjs",
     "perf:baseline": "node scripts/perf-report.mjs --save-baseline",
     "perf:check": "node scripts/perf-check.mjs",
