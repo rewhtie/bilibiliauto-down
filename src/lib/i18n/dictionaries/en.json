@@ -53,6 +53,7 @@
             "bilibili": "Bilibili",
             "douyin": "Douyin",
             "xiaohongshu": "Xiaohongshu",
+            "tiktok": "TikTok",
             "unknown": "Unknown"
         }
     },
@@ -171,7 +172,7 @@
             "title": "Platform Support Guide",
             "bilibili": {
                 "name": "Bilibili",
-                "summary": "Video/audio download support"
+                "summary": "Video download, audio extraction & share code support"
             },
             "douyin": {
                 "name": "Douyin",
@@ -179,7 +180,11 @@
             },
             "xiaohongshu": {
                 "name": "Xiaohongshu",
-                "summary": "Image/video note support"
+                "summary": "Video download & image notes support"
+            },
+            "tiktok": {
+                "name": "TikTok",
+                "summary": "Video download support"
             },
             "comingSoon": "🔄 More platforms coming soon..."
         },
