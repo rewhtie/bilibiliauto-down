@@ -110,8 +110,6 @@ export function UnifiedDownloader({
                 return dict.history.platforms.douyin;
             case 'xiaohongshu':
                 return dict.history.platforms.xiaohongshu;
-            case 'tiktok':
-                return dict.history.platforms.tiktok;
             default:
                 return dict.history.platforms.unknown;
         }

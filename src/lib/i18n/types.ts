@@ -74,7 +74,6 @@ export interface Dictionary {
             bilibili: string;
             douyin: string;
             xiaohongshu: string;
-            tiktok: string;
             unknown: string;
         };
     };
@@ -143,12 +142,6 @@ export interface Dictionary {
                 };
             };
             xiaohongshu: {
-                name: string;
-                summary: string;
-                features?: string[];
-                limitations?: string[];
-            };
-            tiktok: {
                 name: string;
                 summary: string;
                 features?: string[];
