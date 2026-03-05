@@ -45,7 +45,6 @@ export function FeedbackDialog({
     defaultOpen = false,
     onTriggerClick,
 }: FeedbackDialogProps) {
-    void locale
     const feedback = dict.feedback
     const [open, setOpen] = useState(defaultOpen)
     const [feedbackType, setFeedbackType] = useState<FeedbackType>('bug')
@@ -101,7 +100,7 @@ export function FeedbackDialog({
                 type: feedbackType,
                 content: content.trim(),
                 email: email.trim(),
-            })
+            }, locale)
 
             if (result.success) {
                 setSubmitStatus('success')

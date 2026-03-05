@@ -24,7 +24,12 @@ export function buildApiI18nHeaders(locale: Locale): Record<'x-lang' | 'Accept-L
 
 export function appendLangQuery(url: string, locale: Locale): string {
     const lang = localeToApiLanguage(locale)
-    const hasQuery = url.includes('?')
-    const separator = hasQuery ? '&' : '?'
-    return `${url}${separator}lang=${encodeURIComponent(lang)}`
+    const [base, hash = ''] = url.split('#', 2)
+    const [path, query = ''] = base.split('?', 2)
+    const params = new URLSearchParams(query)
+    params.set('lang', lang)
+
+    const queryString = params.toString()
+    const result = queryString ? `${path}?${queryString}` : path
+    return hash ? `${result}#${hash}` : result
 }

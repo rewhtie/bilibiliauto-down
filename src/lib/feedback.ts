@@ -1,11 +1,13 @@
 import { FEEDBACK_CONFIG, type FeedbackData } from './feedback-config'
+import type { Locale } from './i18n/config'
+import { appendLangQuery, buildApiI18nHeaders } from './api-i18n'
 
 /**
  * 提交反馈到自建API
  * @param data 反馈数据
  * @returns Promise<{ success: boolean, error?: string }>
  */
-export async function submitFeedback(data: FeedbackData): Promise<{ success: boolean; error?: string }> {
+export async function submitFeedback(data: FeedbackData, locale: Locale): Promise<{ success: boolean; error?: string }> {
   try {
     // 构建请求体
     const requestBody = {
@@ -15,10 +17,11 @@ export async function submitFeedback(data: FeedbackData): Promise<{ success: boo
     }
 
     // 发送POST请求到自建API
-    const response = await fetch(FEEDBACK_CONFIG.apiUrl, {
+    const response = await fetch(appendLangQuery(FEEDBACK_CONFIG.apiUrl, locale), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...buildApiI18nHeaders(locale),
       },
       body: JSON.stringify(requestBody),
     })

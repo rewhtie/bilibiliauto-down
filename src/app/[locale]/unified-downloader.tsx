@@ -15,6 +15,7 @@ import { DeferredLanguageSwitcher } from "@/components/deferred-language-switche
 import { DeferredFeedbackDialog } from '@/components/deferred-feedback-dialog';
 import { DeferredChangelogDialog } from '@/components/deferred-changelog-dialog';
 import { API_ENDPOINTS } from '@/lib/config';
+import { appendLangQuery, buildApiI18nHeaders } from '@/lib/api-i18n';
 
 import type { DownloadRecord } from './download-history';
 import { useLocalStorageState } from '@/hooks/use-local-storage-state';
@@ -54,10 +55,13 @@ type UnifiedParseSuccessResult = UnifiedParseResult & {
     data: NonNullable<UnifiedParseResult['data']>;
 };
 
-async function requestUnifiedParse(videoUrl: string): Promise<UnifiedParseSuccessResult> {
-    const response = await fetch(`${API_ENDPOINTS.unified.parse}?url=${encodeURIComponent(videoUrl)}`, {
+async function requestUnifiedParse(videoUrl: string, locale: Locale): Promise<UnifiedParseSuccessResult> {
+    const params = new URLSearchParams({ url: videoUrl });
+    const requestUrl = appendLangQuery(`${API_ENDPOINTS.unified.parse}?${params.toString()}`, locale);
+    const response = await fetch(requestUrl, {
         method: 'GET',
         cache: 'no-store',
+        headers: buildApiI18nHeaders(locale),
     });
 
     let payload: UnifiedParseResult | null = null;
@@ -120,7 +124,7 @@ export function UnifiedDownloader({
     // 统一解析处理：只解析不自动下载
     const handleUnifiedParse = async (videoUrl: string) => {
         // 调用解析接口获取视频信息
-        const apiResult = await requestUnifiedParse(videoUrl);
+        const apiResult = await requestUnifiedParse(videoUrl, locale);
         const platformCode = apiResult.data.platform;
         const platformLabel = getPlatformLabel(platformCode);
 
