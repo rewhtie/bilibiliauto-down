@@ -11,7 +11,6 @@ const ALLOWED_IMAGE_HOSTS = [
     'tiktokcdn.com',
     'tiktokcdn-us.com',
     'tiktok.com',
-    
 ];
 
 const DEFAULT_ACCEPT =
