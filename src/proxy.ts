@@ -20,19 +20,10 @@ function getAcceptedLanguages(request: NextRequest): string[] {
     return new Negotiator({ headers: negotiatorHeaders }).languages()
 }
 
-function getLocale(request: NextRequest): string {
-    return resolveLocaleForRequest({
-        pathname: request.nextUrl.pathname,
-        userAgent: request.headers.get('user-agent') || '',
-        cookieLocale: getLocaleFromCookie(request),
-        acceptLanguages: getAcceptedLanguages(request),
-        locales: i18n.locales,
-        defaultLocale: i18n.defaultLocale,
-    })
-}
-
 export function proxy(request: NextRequest) {
     const pathname = request.nextUrl.pathname
+    const userAgent = request.headers.get('user-agent') || ''
+    const cookieLocale = getLocaleFromCookie(request)
 
     // 跳过 API 路由和静态文件
     if (
@@ -40,7 +31,7 @@ export function proxy(request: NextRequest) {
         pathname.startsWith('/_next/') ||
         pathname.includes('.')
     ) {
-        return
+        return NextResponse.next()
     }
 
     // 检查路径名中是否有任何支持的区域设置
@@ -48,16 +39,25 @@ export function proxy(request: NextRequest) {
         (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
     )
 
-    if (pathnameHasLocale) return
+    if (pathnameHasLocale) {
+        return NextResponse.next()
+    }
 
     // 如果没有区域设置则重定向
-    const locale = getLocale(request)
+    const locale = resolveLocaleForRequest({
+        pathname,
+        userAgent,
+        cookieLocale,
+        acceptLanguages: getAcceptedLanguages(request),
+        locales: i18n.locales,
+        defaultLocale: i18n.defaultLocale,
+    })
     request.nextUrl.pathname = `/${locale}${pathname}`
 
     const response = NextResponse.redirect(request.nextUrl)
 
     // 设置 Cookie 记住用户语言偏好（仅在真实用户请求且非已有 cookie 时设置）
-    if (!isBotUserAgent(request.headers.get('user-agent') || '') && !getLocaleFromCookie(request)) {
+    if (!isBotUserAgent(userAgent) && !cookieLocale) {
         response.cookies.set('preferred-locale', locale, {
             path: '/',
             maxAge: 31536000, // 1年
@@ -71,10 +71,7 @@ export function proxy(request: NextRequest) {
 
 export const config = {
     matcher: [
-        // 匹配所有路径除了以下情况：
-        // - api 路由
-        // - _next 静态文件
-        // - 包含点的文件 (如 .ico, .png 等)
-        '/((?!api|_next/static|_next/image|favicon.ico|.*\\.).*)',
+        // 仅匹配“无 locale 前缀”的页面请求，减少中间件对已本地化路由的额外开销
+        '/((?!api|_next/static|_next/image|favicon.ico|.*\\.|(?:zh|zh-tw|en)(?:/|$)).*)',
     ],
 } 

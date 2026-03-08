@@ -127,7 +127,7 @@ export function DownloadHistory({ dict, downloadHistory, clearHistory, onRedownl
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder={dict.history.searchPlaceholder}
                             aria-label={dict.history.searchPlaceholder}
-                            className="w-40 sm:w-56"
+                            className="w-30 sm:w-56"
                         />
                     </div>
                 </CardHeader>

@@ -294,7 +294,7 @@ export function UnifiedDownloader({
                                     </p>
                                     {heroMeta}
                                 </CardHeader>
-                                <CardContent className="p-4">
+                                <CardContent className="px-4 pb-4 pt-0">
                                     <form onSubmit={handleSubmit} className="space-y-6">
                                         <div className="space-y-2">
                                             <Textarea
