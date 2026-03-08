@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "../globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { DeferredAnalytics } from "@/components/deferred-analytics"
@@ -145,6 +146,7 @@ export default async function RootLayout({
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
                 <DeferredToaster />
                 <DeferredAnalytics />
+                <SpeedInsights />
                 <DeferredWebVitalsTracker />
                 <ThemeProvider
                     attribute="class"
