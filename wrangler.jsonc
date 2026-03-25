@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "bilibili-audio-downloader",
+  "name": "galaxy-downloader",
   "compatibility_date": "2026-03-25",
   "compatibility_flags": [
     "nodejs_compat"
