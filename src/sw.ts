@@ -2,6 +2,11 @@ import { defaultCache } from "@serwist/next/worker";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
 import { Serwist, CacheFirst, ExpirationPlugin } from "serwist";
 
+const SW_BYPASS_HOSTS = new Set([
+  "pagead2.googlesyndication.com",
+  "www.googletagmanager.com",
+]);
+
 declare global {
   interface ServiceWorkerGlobalScope extends SerwistGlobalConfig {
     __SW_MANIFEST: (PrecacheEntry | string)[] | undefined;
@@ -31,6 +36,14 @@ const serwist = new Serwist({
         }),
     }
   ],
+});
+
+// Let the browser handle Google Ads and Analytics scripts directly.
+self.addEventListener("fetch", (event) => {
+  const url = new URL(event.request.url);
+  if (SW_BYPASS_HOSTS.has(url.hostname)) {
+    event.stopImmediatePropagation();
+  }
 });
 
 serwist.addEventListeners();
