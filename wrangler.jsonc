@@ -22,12 +22,4 @@
     "traces": {
       "enabled": true
     }
-  },
-  "routes": [
-    {
-      "pattern": "downloader.bhwa233.com",
-      "zone_name": "bhwa233.com",
-      "custom_domain": true
-    }
-  ]
-}
+  }}
