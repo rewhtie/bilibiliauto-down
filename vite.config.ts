@@ -1,3 +1,4 @@
+import { cloudflare } from "@cloudflare/vite-plugin";
 import { serwist } from "@serwist/vite";
 import vinext from "vinext";
 import { defineConfig } from "vite";
@@ -11,6 +12,9 @@ export default defineConfig({
   },
   plugins: [
     vinext(),
+    ...cloudflare({
+      viteEnvironment: { name: "rsc", childEnvironments: ["ssr"] },
+    }),
     ...serwist({
       swSrc: "src/sw.ts",
       swDest: "client/sw.js",
