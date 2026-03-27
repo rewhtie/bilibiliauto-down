@@ -32,5 +32,7 @@ export function getPlatformSupportItems(dict: Pick<Dictionary, 'guide'>): Platfo
         { key: 'douyin', name: support.douyin.name, features: resolveFeatures(support.douyin) },
         { key: 'xiaohongshu', name: support.xiaohongshu.name, features: resolveFeatures(support.xiaohongshu) },
         { key: 'tiktok', name: support.tiktok.name, features: resolveFeatures(support.tiktok) },
+        { key: 'instagram', name: support.instagram.name, features: resolveFeatures(support.instagram) },
+        { key: 'x', name: support.x.name, features: resolveFeatures(support.x) },
     ];
 }
