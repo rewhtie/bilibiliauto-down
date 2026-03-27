@@ -9,11 +9,11 @@
           "优化浏览器端音频提取器加载流程，减少初始化失败问题"
         ],
         "en": [
-          "Added support for Instagram and X",
+          "Added platform support for Instagram and X",
           "Improved the browser-side audio extractor loading flow to reduce initialization failures"
         ],
         "ja": [
-          "Instagram と X に対応しました",
+          "Instagram と X のサポートを追加しました",
           "ブラウザ側の音声抽出機能の読み込みフローを改善し、初期化失敗を減らしました"
         ],
         "zh-tw": [

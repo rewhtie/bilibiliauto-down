@@ -1,16 +1,19 @@
 # 通用媒体下载器
 
-这是一个基于 [vinext](https://github.com/cloudflare/vinext) 运行的 Next.js App Router 兼容项目，支持从 Bilibili、抖音、小红书等平台下载视频和音频。
+这是一个基于 [vinext](https://github.com/cloudflare/vinext) 运行的 Next.js App Router 兼容项目，支持从 Bilibili、抖音、Instagram、小红书、TikTok、X 等平台下载视频、音频和图文内容。
 
 ## 功能特点
 
 - 🎵 支持 Bilibili 视频/音频下载
 - 🎬 支持抖音无水印视频下载及音频提取
+- 📱 支持 Instagram Reels、帖子和图文内容下载
 - 📷 支持小红书视频笔记和图文笔记下载
+- 🎞️ 支持 TikTok 视频下载
+- 🐦 支持 X 视频下载及音频提取
 - 🔍 自动识别平台链接
 - 🎨 现代化的用户界面设计
 - 💾 本地下载历史记录
-- 🌍 多语言支持（简体中文、繁体中文、英文）
+- 🌍 多语言支持（简体中文、繁体中文、英文、日文）
 
 ## 开始使用
 
@@ -30,17 +33,20 @@ pnpm dev:next
 
 ## 使用方法
 
-1. 复制视频链接（支持 Bilibili、抖音、小红书等平台）
+1. 复制媒体链接（支持 Bilibili、抖音、Instagram、小红书、TikTok、X 等平台）
 2. 粘贴到输入框中
 3. 点击解析按钮
-4. 选择下载音频或视频
+4. 选择下载视频、音频或图片
 5. 等待下载完成，文件会自动保存
 
 ### 支持的链接格式
 
 - **Bilibili**: `https://www.bilibili.com/video/BV...` 或 `https://b23.tv/...`
 - **抖音**: `https://www.douyin.com/...` 或 `https://v.douyin.com/...`
+- **Instagram**: `https://www.instagram.com/reel/...` 或 `https://www.instagram.com/p/...`
 - **小红书**: `https://www.xiaohongshu.com/explore/...` 或 `https://xhslink.com/...`
+- **TikTok**: `https://www.tiktok.com/@.../video/...`
+- **X**: `https://x.com/.../status/...`
 
 ## 技术栈
 
@@ -54,6 +60,21 @@ pnpm dev:next
 - Fetch API（前端网络请求）
 - FFmpeg.wasm (浏览器端音频提取)
 - JSZip (图片打包下载)
+
+## 当前平台支持
+
+- **Bilibili**: 视频、音频、分享口令
+- **Bilibili TV**: 仅音频
+- **抖音**: 视频、图文、分享口令
+- **Instagram**: Reels、帖子、图文
+- **小红书**: 视频、图文
+- **TikTok**: 视频
+- **X**: 视频
+
+说明：
+
+- 音频提取目前以浏览器端处理为主，受浏览器性能和文件大小影响
+- 图文内容支持按平台返回结果分别下载或打包下载
 
 ## 本地开发
 
