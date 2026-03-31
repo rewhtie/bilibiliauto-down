@@ -1,5 +1,4 @@
-import assert from 'node:assert/strict'
-import test from 'node:test'
+import { describe, expect, it } from 'vitest'
 
 import {ApiRequestError, resolveApiErrorMessage} from '../src/lib/api-errors.ts'
 
@@ -26,17 +25,19 @@ const dict = {
     },
 } as const
 
-test('uses localized message when api error code is known', () => {
+describe('resolveApiErrorMessage', () => {
+it('uses localized message when api error code is known', () => {
     const error = new ApiRequestError({code: 'BAD_REQUEST'})
-    assert.equal(resolveApiErrorMessage(error, dict as never), 'Bad request message')
+    expect(resolveApiErrorMessage(error, dict as never)).toBe('Bad request message')
 })
 
-test('falls back to backend message when api code is missing', () => {
+it('falls back to backend message when api code is missing', () => {
     const error = new ApiRequestError({fallbackMessage: 'Backend message'})
-    assert.equal(resolveApiErrorMessage(error, dict as never), 'Backend message')
+    expect(resolveApiErrorMessage(error, dict as never)).toBe('Backend message')
 })
 
-test('falls back to generic message when error payload is empty', () => {
+it('falls back to generic message when error payload is empty', () => {
     const error = new ApiRequestError({})
-    assert.equal(resolveApiErrorMessage(error, dict as never), 'Generic error')
+    expect(resolveApiErrorMessage(error, dict as never)).toBe('Generic error')
+})
 })

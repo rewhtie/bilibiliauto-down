@@ -1,20 +1,21 @@
-import assert from 'node:assert/strict'
-import test from 'node:test'
+import { describe, expect, it } from 'vitest'
 
 import { normalizePlatform, supportsAudioExtraction } from '../src/lib/platforms.ts'
 
-test('normalizes instagram aliases to canonical platform', () => {
-    assert.equal(normalizePlatform('instagram'), 'instagram')
-    assert.equal(normalizePlatform('ins'), 'instagram')
+describe('platform helpers', () => {
+it('normalizes instagram aliases to canonical platform', () => {
+    expect(normalizePlatform('instagram')).toBe('instagram')
+    expect(normalizePlatform('ins')).toBe('instagram')
 })
 
-test('normalizes x aliases to canonical platform', () => {
-    assert.equal(normalizePlatform('x'), 'x')
-    assert.equal(normalizePlatform('twitter'), 'x')
+it('normalizes x aliases to canonical platform', () => {
+    expect(normalizePlatform('x')).toBe('x')
+    expect(normalizePlatform('twitter')).toBe('x')
 })
 
-test('marks x and instagram as audio-extractable platforms', () => {
-    assert.equal(supportsAudioExtraction('instagram'), true)
-    assert.equal(supportsAudioExtraction('x'), true)
-    assert.equal(supportsAudioExtraction('bilibili'), false)
+it('marks x and instagram as audio-extractable platforms', () => {
+    expect(supportsAudioExtraction('instagram')).toBe(true)
+    expect(supportsAudioExtraction('x')).toBe(true)
+    expect(supportsAudioExtraction('bilibili')).toBe(false)
+})
 })

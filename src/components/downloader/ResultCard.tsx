@@ -9,6 +9,7 @@ import { downloadFile, formatDuration, sanitizeFilename } from "../../lib/utils"
 import { useState, useEffect, useRef } from 'react';
 import { toast } from '@/lib/deferred-toast';
 import { normalizePlatform, supportsAudioExtraction } from '@/lib/platforms';
+import { shouldHideSingleImagePreview, shouldShowVideoDownloadButton } from "./result-card-visibility";
 
 const ExtractAudioButton = dynamic(
     () => import("./ExtractAudioButton").then((m) => m.ExtractAudioButton),
@@ -107,9 +108,9 @@ function SinglePartButtons({ result }: { result: NonNullable<UnifiedParseResult[
     const [audioLoading, setAudioLoading] = useState(false);
     const normalizedPlatform = normalizePlatform(result.platform);
     const showExtractAudio = supportsAudioExtraction(normalizedPlatform);
-    const hideVideoDownload = normalizedPlatform === 'bilibili_tv';
     const videoDownloadUrl = result.downloadVideoUrl || result.originDownloadVideoUrl;
     const audioDownloadUrl = result.downloadAudioUrl || result.originDownloadAudioUrl || null;
+    const showVideoDownload = shouldShowVideoDownloadButton(videoDownloadUrl);
 
     const handleDownload = (url: string, setLoading: (v: boolean) => void) => {
         setLoading(true);
@@ -120,12 +121,12 @@ function SinglePartButtons({ result }: { result: NonNullable<UnifiedParseResult[
     return (
         <>
             <div className="grid grid-cols-2 gap-2">
-                {videoDownloadUrl && !hideVideoDownload && (
+                {showVideoDownload && (
                     <Button
                         variant="outline"
                         className="flex items-center justify-center gap-2"
                         disabled={videoLoading}
-                        onClick={() => handleDownload(videoDownloadUrl, setVideoLoading)}
+                        onClick={() => handleDownload(videoDownloadUrl!, setVideoLoading)}
                     >
                         {videoLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                         {dict.result.downloadVideo}
@@ -440,6 +441,12 @@ function ImageNoteGrid({
     const loadedCount = Array.from(imageStates.values()).filter(state => !state.loading).length;
     const allLoaded = loadedCount === images.length;
     const successCount = Array.from(imageStates.values()).filter(state => !state.error && state.blobUrl).length;
+    const singleImageState = singleImageMode ? imageStates.get(0) : undefined;
+    const shouldHideSingleImage = shouldHideSingleImagePreview(singleImageMode, singleImageState);
+
+    if (shouldHideSingleImage) {
+        return null;
+    }
 
     return (
         <div className="space-y-3">

@@ -1,5 +1,4 @@
-import assert from 'node:assert/strict'
-import test from 'node:test'
+import { describe, expect, it } from 'vitest'
 
 import {
     isBotUserAgent,
@@ -10,12 +9,13 @@ import {
 const locales = ['zh', 'zh-tw', 'en', 'ja'] as const
 const defaultLocale = 'en'
 
-test('detects bot user agents', () => {
-    assert.equal(isBotUserAgent('Mozilla/5.0 Googlebot/2.1'), true)
-    assert.equal(isBotUserAgent('Mozilla/5.0 AppleWebKit Safari'), false)
+describe('seo routing', () => {
+it('detects bot user agents', () => {
+    expect(isBotUserAgent('Mozilla/5.0 Googlebot/2.1')).toBe(true)
+    expect(isBotUserAgent('Mozilla/5.0 AppleWebKit Safari')).toBe(false)
 })
 
-test('returns locale from pathname when locale prefix exists', () => {
+it('returns locale from pathname when locale prefix exists', () => {
     const locale = resolveLocaleForRequest({
         pathname: '/en/contact',
         userAgent: 'Mozilla/5.0',
@@ -24,10 +24,10 @@ test('returns locale from pathname when locale prefix exists', () => {
         locales,
         defaultLocale,
     })
-    assert.equal(locale, 'en')
+    expect(locale).toBe('en')
 })
 
-test('uses cookie locale for normal users when no locale prefix', () => {
+it('uses cookie locale for normal users when no locale prefix', () => {
     const locale = resolveLocaleForRequest({
         pathname: '/contact',
         userAgent: 'Mozilla/5.0',
@@ -36,10 +36,10 @@ test('uses cookie locale for normal users when no locale prefix', () => {
         locales,
         defaultLocale,
     })
-    assert.equal(locale, 'zh-tw')
+    expect(locale).toBe('zh-tw')
 })
 
-test('bots ignore cookie locale and use accept-language', () => {
+it('bots ignore cookie locale and use accept-language', () => {
     const locale = resolveLocaleForRequest({
         pathname: '/contact',
         userAgent: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
@@ -48,17 +48,18 @@ test('bots ignore cookie locale and use accept-language', () => {
         locales,
         defaultLocale,
     })
-    assert.equal(locale, 'en')
+    expect(locale).toBe('en')
 })
 
-test('accept-language mapping supports zh-Hant fallback to zh-tw', () => {
-    assert.equal(resolveLocaleFromAcceptLanguage(['zh-Hant', 'en-US'], locales, defaultLocale), 'zh-tw')
+it('accept-language mapping supports zh-Hant fallback to zh-tw', () => {
+    expect(resolveLocaleFromAcceptLanguage(['zh-Hant', 'en-US'], locales, defaultLocale)).toBe('zh-tw')
 })
 
-test('accept-language mapping supports ja fallback to ja', () => {
-    assert.equal(resolveLocaleFromAcceptLanguage(['ja-JP', 'en-US'], locales, defaultLocale), 'ja')
+it('accept-language mapping supports ja fallback to ja', () => {
+    expect(resolveLocaleFromAcceptLanguage(['ja-JP', 'en-US'], locales, defaultLocale)).toBe('ja')
 })
 
-test('falls back to default locale for unsupported accept-language', () => {
-    assert.equal(resolveLocaleFromAcceptLanguage(['fr-FR'], locales, defaultLocale), 'en')
+it('falls back to default locale for unsupported accept-language', () => {
+    expect(resolveLocaleFromAcceptLanguage(['fr-FR'], locales, defaultLocale)).toBe('en')
+})
 })
