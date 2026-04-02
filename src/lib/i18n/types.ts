@@ -7,6 +7,9 @@ export interface ResultDict {
     originDownloadVideo: string;
     originDownloadAudio: string;
     totalParts: string;
+    articleVideoList: string;
+    articleVideoCount: string;
+    articleVideoUntitled: string;
     downloadImage: string;
     coverLabel: string;
     imageIndexLabel: string;
@@ -105,6 +108,8 @@ export interface Dictionary {
             bilibili: string;
             bilibiliTv: string;
             douyin: string;
+            wechat: string;
+            niconico: string;
             xiaohongshu: string;
             tiktok: string;
             instagram: string;
@@ -230,6 +235,18 @@ export interface Dictionary {
                         url: string;
                     };
                 };
+            };
+            wechat: {
+                name: string;
+                summary: string;
+                features?: string[];
+                limitations?: string[];
+            };
+            niconico: {
+                name: string;
+                summary: string;
+                features?: string[];
+                limitations?: string[];
             };
             xiaohongshu: {
                 name: string;

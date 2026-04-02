@@ -3,11 +3,11 @@ import { Button } from "@/components/ui/button";
 import { X, Download, ExternalLink, Loader2, Package } from 'lucide-react';
 import Image from "next/image";
 import { useDictionary } from '@/i18n/client';
-import { UnifiedParseResult, PageInfo } from "../../lib/types";
-import { normalizePlatform } from "@/lib/platforms";
+import { UnifiedParseResult, PageInfo, EmbeddedVideoInfo } from "../../lib/types";
 import { downloadFile, formatDuration, sanitizeFilename } from "../../lib/utils";
 import { useState, useEffect, useRef } from 'react';
 import { toast } from '@/lib/deferred-toast';
+import { normalizePlatform } from "@/lib/platforms";
 import { shouldHideSingleImagePreview, shouldShowVideoDownloadButton } from "./result-card-visibility";
 
 interface ResultCardProps {
@@ -34,12 +34,23 @@ function replaceTemplate(template: string, token: string, value: string): string
     return template.replace(token, value);
 }
 
+function triggerBlobDownload(blob: Blob, filename: string) {
+    const objectUrl = URL.createObjectURL(blob);
+    downloadFile(objectUrl, filename);
+
+    // Revoke after the click has been dispatched so browsers can resolve the blob URL.
+    window.setTimeout(() => {
+        URL.revokeObjectURL(objectUrl);
+    }, 1000);
+}
+
 export function ResultCard({ result, onClose, onOpenExtractAudio }: ResultCardProps) {
     const dict = useDictionary()
     if (!result) return null;
 
     const isMultiPart = result.isMultiPart && result.pages && result.pages.length > 1;
     const isImageNote = result.noteType === 'image' && !!result.images?.length;
+    const hasEmbeddedVideos = !!result.videos?.length;
     const coverUrl = typeof result.cover === 'string' ? result.cover.trim() : '';
     const shouldShowCover = !isImageNote && coverUrl.length > 0;
     const coverSrc = shouldShowCover ? resolveCoverSrc(coverUrl) : '';
@@ -85,6 +96,8 @@ export function ResultCard({ result, onClose, onOpenExtractAudio }: ResultCardPr
                             pages={result.pages!}
                             currentPage={result.currentPage}
                         />
+                    ) : hasEmbeddedVideos ? (
+                        <EmbeddedVideoList videos={result.videos!} />
                     ) : (
                         <SinglePartButtons result={result} onOpenExtractAudio={onOpenExtractAudio} />
                     )}
@@ -282,6 +295,83 @@ function MultiPartList({ pages, currentPage }: { pages: PageInfo[]; currentPage?
     );
 }
 
+function EmbeddedVideoList({ videos }: { videos: EmbeddedVideoInfo[] }) {
+    const dict = useDictionary();
+    const [loadingKeys, setLoadingKeys] = useState<Set<string>>(new Set());
+
+    const handleDownload = (url: string, key: string) => {
+        setLoadingKeys(prev => new Set(prev).add(key));
+        downloadFile(url);
+        setTimeout(() => {
+            setLoadingKeys(prev => {
+                const next = new Set(prev);
+                next.delete(key);
+                return next;
+            });
+        }, 1500);
+    };
+
+    return (
+        <div className="space-y-2">
+            <div className="text-sm text-foreground/75">
+                <span>{dict.result.articleVideoList}</span>
+                <span className="ml-2">
+                    {replaceTemplate(dict.result.articleVideoCount, '{count}', String(videos.length))}
+                </span>
+            </div>
+            <div className="max-h-[300px] overflow-y-auto space-y-2 pr-1">
+                {videos.map((video, index) => {
+                    const videoDownloadUrl = video.downloadVideoUrl || video.originDownloadVideoUrl || null;
+                    const loadingKey = `${video.id || index}-video`;
+                    const displayTitle = video.title?.trim()
+                        || replaceTemplate(dict.result.articleVideoUntitled, '{index}', String(index + 1));
+
+                    return (
+                        <div
+                            key={video.id || index}
+                            className="flex flex-col md:flex-row md:items-center gap-2 p-2 md:p-3 rounded-lg border border-border hover:bg-muted/50"
+                        >
+                            <div className="flex items-start md:items-center gap-2 flex-1 min-w-0">
+                                <span className="text-xs font-medium text-foreground/70 shrink-0">
+                                    {index + 1}
+                                </span>
+                                <div className="flex-1 min-w-0">
+                                    <div className="text-sm line-clamp-2 md:truncate break-words" title={displayTitle}>
+                                        {displayTitle}
+                                    </div>
+                                    {video.duration != null && (
+                                        <span className="text-xs text-foreground/65 md:hidden">
+                                            {formatDuration(video.duration)}
+                                        </span>
+                                    )}
+                                </div>
+                                {video.duration != null && (
+                                    <span className="text-xs text-foreground/65 shrink-0 hidden md:inline">
+                                        {formatDuration(video.duration)}
+                                    </span>
+                                )}
+                            </div>
+                            <div className="md:shrink-0">
+                                {shouldShowVideoDownloadButton(videoDownloadUrl) && (
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        disabled={loadingKeys.has(loadingKey)}
+                                        onClick={() => handleDownload(videoDownloadUrl!, loadingKey)}
+                                    >
+                                        {loadingKeys.has(loadingKey) && <Loader2 className="h-3 w-3 animate-spin mr-1" />}
+                                        {dict.result.downloadVideo}
+                                    </Button>
+                                )}
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
 function ImageNoteGrid({
     images,
     title,
@@ -473,7 +563,7 @@ function ImageNoteGrid({
             const zipBlob = await zip.generateAsync({ type: 'blob' });
 
             // 触发下载
-            downloadFile(URL.createObjectURL(zipBlob), `${sanitizeFilename(title)}.zip`);
+            triggerBlobDownload(zipBlob, `${sanitizeFilename(title)}.zip`);
         } catch (error) {
             console.error('Failed to package images:', error);
             toast.error(dict.errors.packageFailed);

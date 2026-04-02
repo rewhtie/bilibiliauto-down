@@ -1,7 +1,7 @@
 {
   "versions": [
     {
-      "version": "3.1.0",
+      "version": "3.2.0",
       "date": "2026-04-02",
       "changes": {
         "zh": [
@@ -15,6 +15,24 @@
         ],
         "zh-tw": [
           "新增「音訊處理」功能，支援提取音訊與音影片合併"
+        ]
+      }
+    },
+    {
+      "version": "3.1.0",
+      "date": "2026-04-01",
+      "changes": {
+        "zh": [
+          "新增支持微信公众号文章视频解析与下载"
+        ],
+        "en": [
+          "Added support for WeChat article video parsing and download"
+        ],
+        "ja": [
+          "WeChat 記事内動画の解析とダウンロードに対応しました"
+        ],
+        "zh-tw": [
+          "新增支援微信公眾號文章影片解析與下載"
         ]
       }
     },
