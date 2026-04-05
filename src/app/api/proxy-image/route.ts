@@ -6,6 +6,7 @@ const ALLOWED_IMAGE_HOSTS = [
     'bilibili.com',
     'biliimg.com',
     'bstarstatic.com',
+    'mmbiz.qpic.cn',
     'xhscdn.com',
     'xiaohongshu.com',
     'tiktokcdn.com',
@@ -58,6 +59,9 @@ function getReferer(hostname: string): string | undefined {
     }
     if (normalized.endsWith('nimg.jp')) {
         return 'https://www.nicovideo.jp/';
+    }
+    if (normalized.endsWith('mmbiz.qpic.cn')) {
+        return 'https://mp.weixin.qq.com/';
     }
     if (
         normalized.endsWith('twimg.com') ||

@@ -1,6 +1,28 @@
 {
   "versions": [
     {
+      "version": "4.0.0",
+      "date": "2026-04-05",
+      "changes": {
+        "zh": [
+          "新增支持 Threads、微博、微信公众号文章等更多内容类型的解析与展示",
+          "重构支持平台展示区域，改为更紧凑的图标化布局，移动端浏览更清晰"
+        ],
+        "en": [
+          "Expanded parsing and display support for more content types across Threads, Weibo, and WeChat articles",
+          "Refined the supported-platform section with a denser icon-based layout for clearer mobile browsing"
+        ],
+        "ja": [
+          "Threads・Weibo・WeChat 記事など、より多くのコンテンツ形式の解析と表示に対応しました",
+          "対応プラットフォーム表示を、モバイルでも見やすいコンパクトなアイコン中心レイアウトに刷新しました"
+        ],
+        "zh-tw": [
+          "新增支援 Threads、微博、微信公眾號文章等更多內容類型的解析與顯示",
+          "重構支援平台展示區塊，改為更緊湊的圖示化布局，行動端瀏覽更清楚"
+        ]
+      }
+    },
+    {
       "version": "3.3.0",
       "date": "2026-04-03",
       "changes": {

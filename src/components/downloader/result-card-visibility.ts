@@ -1,4 +1,6 @@
-import type { VideoAudioMode } from '@/lib/types'
+import type { MediaActions } from '@/lib/types'
+
+type LegacyVideoAudioMode = 'muxed' | 'separate' | 'pure_music' | 'not_applicable'
 
 export interface SingleImageLoadState {
     loading: boolean
@@ -16,9 +18,10 @@ export type ResultVideoAction = 'direct-download' | 'merge-then-download' | 'hid
 export type ResultAudioAction = 'direct-download' | 'extract-audio' | 'hide'
 
 interface ResultMediaActionInput {
-    videoAudioMode?: VideoAudioMode
+    videoAudioMode?: LegacyVideoAudioMode
     videoDownloadUrl?: string | null
     audioDownloadUrl?: string | null
+    mediaActions?: MediaActions
 }
 
 export interface ResultMediaActions {
@@ -26,17 +29,41 @@ export interface ResultMediaActions {
     audioAction: ResultAudioAction
 }
 
-function hasSourceUrl(url: string | null | undefined): boolean {
+function hasSourceUrl(url: string | null | undefined): url is string {
     return typeof url === 'string' && url.length > 0
+}
+
+function sanitizeProvidedMediaActions(
+    mediaActions: MediaActions,
+    hasVideo: boolean,
+    hasAudio: boolean
+): ResultMediaActions {
+    const videoAction = mediaActions.video === 'merge-then-download'
+        ? (hasVideo && hasAudio ? 'merge-then-download' : 'hide')
+        : (mediaActions.video === 'direct-download' && hasVideo ? 'direct-download' : 'hide')
+
+    const audioAction = mediaActions.audio === 'direct-download'
+        ? (hasAudio ? 'direct-download' : 'hide')
+        : (mediaActions.audio === 'extract-audio' && hasVideo ? 'extract-audio' : 'hide')
+
+    return {
+        videoAction,
+        audioAction,
+    }
 }
 
 export function getResultMediaActions({
     videoAudioMode,
     videoDownloadUrl,
     audioDownloadUrl,
+    mediaActions,
 }: ResultMediaActionInput): ResultMediaActions {
     const hasVideo = hasSourceUrl(videoDownloadUrl)
     const hasAudio = hasSourceUrl(audioDownloadUrl)
+
+    if (mediaActions) {
+        return sanitizeProvidedMediaActions(mediaActions, hasVideo, hasAudio)
+    }
 
     // Prefer native audio download whenever backend provides a direct audio url.
     if (hasAudio) {
@@ -57,6 +84,13 @@ export function getResultMediaActions({
         return {
             videoAction: 'hide',
             audioAction: 'hide',
+        }
+    }
+
+    if (videoAudioMode === 'pure_music') {
+        return {
+            videoAction: 'hide',
+            audioAction: hasAudio ? 'direct-download' : 'hide',
         }
     }
 
@@ -82,4 +116,26 @@ export function getResultMediaActions({
 
 export function shouldShowVideoDownloadButton(videoDownloadUrl: string | null | undefined): boolean {
     return hasSourceUrl(videoDownloadUrl)
+}
+
+export function shouldUseFrontendImageProxy(imageUrl: string | null | undefined): boolean {
+    if (!hasSourceUrl(imageUrl)) {
+        return false
+    }
+
+    const resolvedImageUrl = imageUrl
+
+    if (!(resolvedImageUrl.startsWith('http://') || resolvedImageUrl.startsWith('https://'))) {
+        return false
+    }
+
+    try {
+        const parsed = new URL(resolvedImageUrl)
+        if (parsed.pathname !== '/api/image-proxy' && parsed.pathname.endsWith('/download') && parsed.searchParams.has('index')) {
+            return false
+        }
+        return parsed.pathname !== '/api/image-proxy'
+    } catch {
+        return false
+    }
 }

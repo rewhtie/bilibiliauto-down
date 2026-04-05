@@ -5,8 +5,10 @@ export type CanonicalPlatform =
     | 'bilibili_tv'
     | 'douyin'
     | 'telegram'
+    | 'threads'
     | 'wechat'
     | 'niconico'
+    | 'weibo'
     | 'xiaohongshu'
     | 'tiktok'
     | 'instagram'
@@ -19,9 +21,11 @@ const PLATFORM_ALIASES: Record<string, CanonicalPlatform> = {
     bilibili_tv: 'bilibili_tv',
     douyin: 'douyin',
     telegram: 'telegram',
+    threads: 'threads',
     wechat: 'wechat',
     niconico: 'niconico',
     nico: 'niconico',
+    weibo: 'weibo',
     xiaohongshu: 'xiaohongshu',
     tiktok: 'tiktok',
     instagram: 'instagram',
@@ -33,6 +37,8 @@ const PLATFORM_ALIASES: Record<string, CanonicalPlatform> = {
 
 const AUDIO_EXTRACTION_PLATFORMS = new Set<CanonicalPlatform>([
     'douyin',
+    'threads',
+    'weibo',
     'xiaohongshu',
     'tiktok',
     'instagram',
@@ -60,10 +66,14 @@ export function getPlatformLabel(
             return dict.history.platforms.douyin
         case 'telegram':
             return dict.history.platforms.telegram
+        case 'threads':
+            return dict.history.platforms.threads
         case 'wechat':
             return dict.history.platforms.wechat
         case 'niconico':
             return dict.history.platforms.niconico
+        case 'weibo':
+            return dict.history.platforms.weibo
         case 'xiaohongshu':
             return dict.history.platforms.xiaohongshu
         case 'tiktok':
@@ -102,6 +112,11 @@ export function getPlatformBadge(
                 text: dict.history.platforms.telegram,
                 className: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900 dark:text-cyan-300',
             }
+        case 'threads':
+            return {
+                text: dict.history.platforms.threads,
+                className: 'bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-200',
+            }
         case 'wechat':
             return {
                 text: dict.history.platforms.wechat,
@@ -111,6 +126,11 @@ export function getPlatformBadge(
             return {
                 text: dict.history.platforms.niconico,
                 className: 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300',
+            }
+        case 'weibo':
+            return {
+                text: dict.history.platforms.weibo,
+                className: 'bg-rose-100 text-rose-700 dark:bg-rose-900 dark:text-rose-300',
             }
         case 'xiaohongshu':
             return {

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
     getResultMediaActions,
     shouldHideSingleImagePreview,
+    shouldUseFrontendImageProxy,
     shouldShowVideoDownloadButton,
 } from '../src/components/downloader/result-card-visibility.ts'
 
@@ -40,6 +41,18 @@ it('shows video download button for bilibili tv when a video url exists', () => 
 
 it('hides video download button when no video url exists', () => {
     expect(shouldShowVideoDownloadButton(null)).toBe(false)
+})
+
+it('uses frontend image proxy for ordinary remote images', () => {
+    expect(shouldUseFrontendImageProxy('https://wx3.sinaimg.cn/large/mock-cover.jpg')).toBe(true)
+})
+
+it('skips frontend image proxy for backend image-proxy urls', () => {
+    expect(shouldUseFrontendImageProxy('http://localhost:8787/api/image-proxy?platform=weibo&url=https%3A%2F%2Fwx3.sinaimg.cn%2Flarge%2Fmock-cover.jpg')).toBe(false)
+})
+
+it('skips frontend image proxy for backend indexed image download urls', () => {
+    expect(shouldUseFrontendImageProxy('http://localhost:8787/api/wechat/download?url=https%3A%2F%2Fmp.weixin.qq.com%2Fs%2Fabc&index=0&filename=test')).toBe(false)
 })
 
 it('maps separate streams to merge-video plus direct audio download', () => {
@@ -90,6 +103,36 @@ it('still shows audio download when backend marks media as not applicable but au
         })
     ).toEqual({
         videoAction: 'direct-download',
+        audioAction: 'direct-download',
+    })
+})
+
+it('prefers backend mediaActions over inferred muxed extraction behavior', () => {
+    expect(
+        getResultMediaActions({
+            mediaActions: {
+                video: 'direct-download',
+                audio: 'hide',
+            },
+            videoAudioMode: 'muxed',
+            videoDownloadUrl: 'https://example.com/video.mp4',
+            audioDownloadUrl: null,
+        })
+    ).toEqual({
+        videoAction: 'direct-download',
+        audioAction: 'hide',
+    })
+})
+
+it('maps pure music content to audio-only direct download', () => {
+    expect(
+        getResultMediaActions({
+            videoAudioMode: 'pure_music',
+            videoDownloadUrl: null,
+            audioDownloadUrl: 'https://example.com/audio.mp3',
+        })
+    ).toEqual({
+        videoAction: 'hide',
         audioAction: 'direct-download',
     })
 })

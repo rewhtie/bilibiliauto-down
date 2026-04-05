@@ -136,7 +136,7 @@ function resolveResultTaskAction(task: AudioExtractTask | null | undefined): Res
     }
 
     const actions = getResultMediaActions({
-        videoAudioMode: task.videoAudioMode,
+        mediaActions: task.mediaActions,
         videoDownloadUrl: task.videoUrl,
         audioDownloadUrl: task.audioUrl,
     })
@@ -171,7 +171,7 @@ export function AudioExtractDialog({
     const { status, progress, progressInfo, error, extractAudio, extractAudioFromFile, mergeVideoAndAudio, reset, cancel } = useFFmpeg()
     const resultTaskAction = resolveResultTaskAction(autoExtractTask)
     const autoTaskKey = autoExtractTask
-        ? `${autoExtractTask.action ?? ''}::${autoExtractTask.videoAudioMode ?? ''}::${autoExtractTask.audioUrl ?? ''}::${autoExtractTask.videoUrl ?? ''}::${autoExtractTask.sourceUrl ?? ''}::${autoExtractTask.title ?? ''}`
+        ? `${autoExtractTask.action ?? ''}::${autoExtractTask.mediaActions?.video ?? ''}::${autoExtractTask.mediaActions?.audio ?? ''}::${autoExtractTask.audioUrl ?? ''}::${autoExtractTask.videoUrl ?? ''}::${autoExtractTask.sourceUrl ?? ''}::${autoExtractTask.title ?? ''}`
         : null
 
     const ffmpegProcessing = useMemo(
@@ -473,7 +473,7 @@ export function AudioExtractDialog({
             const videoDownloadUrl = parsed.downloadVideoUrl || parsed.originDownloadVideoUrl || null
             const resolvedTitle = parsed.title || parsed.desc || outputTitle
             const parsedActions = getResultMediaActions({
-                videoAudioMode: parsed.videoAudioMode,
+                mediaActions: parsed.mediaActions,
                 videoDownloadUrl,
                 audioDownloadUrl,
             })

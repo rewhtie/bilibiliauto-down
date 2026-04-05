@@ -7,7 +7,7 @@
     },
     "unified": {
         "pageTitle": "ソーシャルメディアダウンローダー",
-        "pageDescription": "リンクを貼り付けると内容を自動判別し、動画・音声・画像投稿をすばやくダウンロードできます。",
+        "pageDescription": "リンクを貼り付けると内容を自動判別し、動画・音声・純音楽・画像投稿をすばやくダウンロードできます。",
         "placeholder": "リンクまたは共有トークンをここに貼り付けてください...",
         "newBadge": "新機能: Douyin 画像ノート対応",
         "exampleLabel": "例:",
@@ -91,7 +91,9 @@
             "tiktok": "TikTok",
             "unknown": "不明",
             "instagram": "Instagram",
-            "x": "X"
+            "x": "X",
+            "threads": "Threads",
+            "weibo": "Weibo"
         }
     },
     "toast": {
@@ -104,11 +106,11 @@
         "installAction": "インストール"
     },
     "metadata": {
-        "title": "ユニバーサルメディアダウンローダー - Bilibili・Douyin・Telegram・WeChat・Niconico・Instagram・Xiaohongshu・TikTok・X に対応",
-        "description": "無料のオンラインメディアダウンローダー。Bilibili の動画・音声、Douyin の動画、Telegram の公開動画メッセージ、WeChat の記事内動画、Niconico の動画・音声、Instagram の Reels・投稿・画像投稿、Xiaohongshu の動画・画像ノート、TikTok の動画、X の動画をワンクリックでダウンロードできます。",
-        "keywords": "オンラインメディアダウンローダー,Bilibili動画ダウンロード,Bilibili音声ダウンロード,Douyin動画ダウンロード,Telegram動画ダウンロード,Telegram公開メッセージダウンロード,WeChat動画ダウンロード,WeChat記事動画ダウンロード,Niconico動画ダウンロード,Niconico音声ダウンロード,Instagram Reelsダウンロード,Instagram投稿ダウンロード,Instagram画像投稿ダウンロード,Xiaohongshu動画ダウンロード,Xiaohongshu画像ノートダウンロード,TikTok動画ダウンロード,X動画ダウンロード",
+        "title": "ユニバーサルメディアダウンローダー - Bilibili・Douyin・Telegram・Threads・WeChat・Weibo・Niconico・Instagram・Xiaohongshu・TikTok・X に対応",
+        "description": "無料のオンラインメディアダウンローダー。Bilibili の動画・音声、Douyin の動画と純音楽、Telegram の公開動画メッセージ、Threads の動画・画像投稿、WeChat の記事内動画、Weibo の動画・混合メディア投稿、Niconico の動画・音声、Instagram の Reels・投稿・画像投稿、Xiaohongshu の動画・画像ノート、TikTok の動画、X の動画をワンクリックでダウンロードできます。",
+        "keywords": "オンラインメディアダウンローダー,Bilibili動画ダウンロード,Bilibili音声ダウンロード,Douyin動画ダウンロード,Douyin音楽ダウンロード,Telegram動画ダウンロード,Threads動画ダウンロード,Threads画像投稿ダウンロード,WeChat動画ダウンロード,Weibo動画ダウンロード,Weibo混合メディアダウンロード,Niconico動画ダウンロード,Niconico音声ダウンロード,Instagram Reelsダウンロード,Instagram投稿ダウンロード,Instagram画像投稿ダウンロード,Xiaohongshu動画ダウンロード,Xiaohongshu画像ノートダウンロード,TikTok動画ダウンロード,X動画ダウンロード",
         "ogTitle": "ユニバーサルメディアダウンローダー - 無料オンラインツール",
-        "ogDescription": "Bilibili、Douyin、Telegram、WeChat、Niconico、Instagram、Xiaohongshu、TikTok、X に対応したメディアダウンローダー。プラットフォームを自動判別して、動画・音声・投稿・画像投稿・記事内動画をワンクリックでダウンロードできます。",
+        "ogDescription": "Bilibili、Douyin、Telegram、Threads、WeChat、Weibo、Niconico、Instagram、Xiaohongshu、TikTok、X に対応したメディアダウンローダー。リンクを自動判別して、動画・音声・画像投稿・混合メディアをワンクリックでダウンロードできます。",
         "siteName": "ユニバーサルメディアダウンローダー"
     },
     "common": {
@@ -227,7 +229,7 @@
             "steps": [
                 {
                     "title": "メディアリンクをコピー",
-                    "description": "Bilibili、Douyin、WeChat、Niconico、Instagram、Xiaohongshu、TikTok、または X から動画・投稿・画像投稿・記事リンクをコピーします"
+                    "description": "Bilibili、Douyin、Telegram、Threads、WeChat、Weibo、Niconico、Instagram、Xiaohongshu、TikTok、または X から動画・投稿・画像投稿・短縮リンク・混合メディアリンクをコピーします"
                 },
                 {
                     "title": "貼り付けて解析",
@@ -244,53 +246,103 @@
             "bilibili": {
                 "name": "Bilibili",
                 "summary": "動画 / 音声 / 共有コード",
-                "features": ["動画", "音声", "共有コード"]
+                "features": [
+                    "動画",
+                    "音声",
+                    "共有コード"
+                ]
             },
             "bilibiliTv": {
                 "name": "Bilibili TV",
-                "summary": "音声のみ",
-                "features": ["音声のみ"]
+                "summary": "動画 / 音声",
+                "features": [
+                    "動画",
+                    "音声"
+                ]
             },
             "douyin": {
                 "name": "Douyin",
-                "summary": "動画 / 画像 / 共有コード",
-                "features": ["動画", "画像", "共有コード"]
+                "summary": "動画 / 画像投稿 / 音声",
+                "features": [
+                    "動画",
+                    "画像投稿",
+                    "音声"
+                ]
             },
             "telegram": {
                 "name": "Telegram",
-                "summary": "公開動画メッセージ",
-                "features": ["公開動画", "メッセージリンク"]
+                "summary": "動画 / メッセージリンク",
+                "features": [
+                    "動画",
+                    "メッセージリンク"
+                ]
             },
             "wechat": {
                 "name": "WeChat",
-                "summary": "記事内動画",
-                "features": ["記事内動画"]
+                "summary": "記事内動画 / 複数動画",
+                "features": [
+                    "記事内動画",
+                    "複数動画"
+                ]
             },
             "niconico": {
                 "name": "Niconico",
                 "summary": "動画 / 音声",
-                "features": ["動画", "音声"]
+                "features": [
+                    "動画",
+                    "音声"
+                ]
             },
             "xiaohongshu": {
                 "name": "Xiaohongshu",
-                "summary": "動画 / 画像",
-                "features": ["動画", "画像"]
+                "summary": "動画 / 画像投稿",
+                "features": [
+                    "動画",
+                    "画像投稿"
+                ]
             },
             "tiktok": {
                 "name": "TikTok",
-                "summary": "動画",
-                "features": ["動画"]
+                "summary": "動画 / 音声",
+                "features": [
+                    "動画",
+                    "音声"
+                ]
             },
             "comingSoon": "さらに追加予定",
             "instagram": {
                 "name": "Instagram",
-                "summary": "Reels / 投稿 / 画像投稿",
-                "features": ["Reels", "投稿", "画像投稿"]
+                "summary": "動画 / 画像投稿 / カルーセル",
+                "features": [
+                    "動画",
+                    "画像投稿",
+                    "カルーセル"
+                ]
             },
             "x": {
                 "name": "X",
-                "summary": "動画",
-                "features": ["動画"]
+                "summary": "動画 / 音声",
+                "features": [
+                    "動画",
+                    "音声"
+                ]
+            },
+            "threads": {
+                "name": "Threads",
+                "summary": "動画 / 画像投稿",
+                "features": [
+                    "動画",
+                    "画像投稿"
+                ]
+            },
+            "weibo": {
+                "name": "Weibo",
+                "summary": "動画 / 画像投稿 / 複数動画",
+                "features": [
+                    "動画",
+                    "画像投稿",
+                    "複数動画"
+                ]
             }
         },
         "linkFormats": {
@@ -356,7 +408,9 @@
                 "Free online tool",
                 "No registration required",
                 "Support multiple media formats",
-                "Browser-based processing"
+                "Browser-based processing",
+                "Download Threads videos and image posts",
+                "Download Weibo videos and mixed-media posts"
             ],
             "zh": [
                 "提取哔哩哔哩视频MP3音频",
@@ -376,7 +430,10 @@
                 "免费在线工具",
                 "无需注册",
                 "支持多种媒体格式",
-                "浏览器内处理"
+                "浏览器内处理",
+                "????????????????",
+                "下载 Threads 视频和图文帖子",
+                "下载微博视频、图文与混合媒体帖子"
             ],
             "zh-tw": [
                 "提取嗶哩嗶哩影片MP3音訊",
@@ -396,15 +453,18 @@
                 "免費線上工具",
                 "無需註冊",
                 "支援多種媒體格式",
-                "瀏覽器內處理"
+                "瀏覽器內處理",
+                "????????????????",
+                "下載 Threads 影片與圖文貼文",
+                "下載微博影片、圖文與混合媒體貼文"
             ],
-                "ja": [
-                    "Bilibili動画からMP3音声を抽出",
-                    "Douyin動画をダウンロード",
-                    "WeChat記事内動画をダウンロード",
-                    "Niconico動画をダウンロード",
-                    "Niconico音声をダウンロード",
-                    "InstagramのReelsと投稿をダウンロード",
+            "ja": [
+                "Bilibili動画からMP3音声を抽出",
+                "Douyin動画をダウンロード",
+                "WeChat記事内動画をダウンロード",
+                "Niconico動画をダウンロード",
+                "Niconico音声をダウンロード",
+                "InstagramのReelsと投稿をダウンロード",
                 "Telegramの公開動画メッセージをダウンロード",
                 "Instagramの画像投稿をダウンロード",
                 "Instagram動画から音声を抽出",
@@ -419,21 +479,23 @@
                 "無料のオンラインツール",
                 "登録不要",
                 "複数のメディア形式に対応",
-                "ブラウザ内で処理"
+                "ブラウザ内で処理",
+                "Threads の動画と画像投稿をダウンロード",
+                "Weibo の動画・画像・混合メディア投稿をダウンロード"
             ]
         },
         "howTo": {
             "title": {
-                "en": "How to download content from Bilibili, Douyin, Telegram, WeChat, Instagram, Xiaohongshu, TikTok, and X",
-                "zh": "如何下载哔哩哔哩、抖音、Telegram、微信公众号、Instagram、小红书、TikTok 和 X 内容",
-                "zh-tw": "如何下載嗶哩嗶哩、抖音、Telegram、微信公眾號、Instagram、小紅書、TikTok 與 X 內容",
-                "ja": "Bilibili・Douyin・Telegram・WeChat・Niconico・Instagram・Xiaohongshu・TikTok・X のコンテンツをダウンロードする方法"
+                "en": "How to download content from Bilibili, Douyin, Telegram, Threads, WeChat, Weibo, Niconico, Instagram, Xiaohongshu, TikTok, and X",
+                "zh": "如何下载哔哩哔哩、抖音、Telegram、Threads、微信公众号、微博、Niconico、Instagram、小红书、TikTok 和 X 内容",
+                "zh-tw": "如何下載嗶哩嗶哩、抖音、Telegram、Threads、微信公眾號、微博、Niconico、Instagram、小紅書、TikTok 與 X 內容",
+                "ja": "Bilibili・Douyin・Telegram・Threads・WeChat・Weibo・Niconico・Instagram・Xiaohongshu・TikTok・X のコンテンツをダウンロードする方法"
             },
             "steps": {
                 "en": [
                     {
                         "name": "Copy link",
-                        "text": "Copy the video, post, image-post, or WeChat article link from Bilibili, Douyin, WeChat, Instagram, Xiaohongshu, TikTok, or X"
+                        "text": "Copy the video, post, image-post, mixed-media post, or article link from Bilibili, Douyin, Telegram, Threads, WeChat, Weibo, Niconico, Instagram, Xiaohongshu, TikTok, or X"
                     },
                     {
                         "name": "Paste link",
@@ -441,7 +503,7 @@
                     },
                     {
                         "name": "Auto-detect",
-                        "text": "The tool will automatically detect the platform (Bilibili/Douyin/WeChat/Instagram/Xiaohongshu/TikTok/X)"
+                        "text": "The tool will automatically detect the platform (Bilibili/Douyin/Telegram/Threads/WeChat/Weibo/Niconico/Instagram/Xiaohongshu/TikTok/X)"
                     },
                     {
                         "name": "Download",
@@ -451,7 +513,7 @@
                 "zh": [
                     {
                         "name": "复制链接",
-                        "text": "从浏览器复制哔哩哔哩、抖音、微信公众号文章、Instagram、小红书、TikTok 或 X 的视频、帖子或图文链接"
+                        "text": "从浏览器复制哔哩哔哩、抖音、Telegram、Threads、微信公众号、微博、Niconico、Instagram、小红书、TikTok 或 X 的视频、帖子、图文、混合媒体或文章链接"
                     },
                     {
                         "name": "粘贴链接",
@@ -459,7 +521,7 @@
                     },
                     {
                         "name": "自动识别",
-                        "text": "工具会自动识别平台（哔哩哔哩/抖音/微信公众号/Instagram/小红书/TikTok/X）"
+                        "text": "工具会自动识别平台（哔哩哔哩/抖音/Telegram/Threads/微信公众号/微博/Niconico/Instagram/小红书/TikTok/X）"
                     },
                     {
                         "name": "下载",
@@ -469,7 +531,7 @@
                 "zh-tw": [
                     {
                         "name": "複製連結",
-                        "text": "從瀏覽器複製嗶哩嗶哩、抖音、微信公眾號文章、Instagram、小紅書、TikTok 或 X 的影片、貼文或圖文連結"
+                        "text": "從瀏覽器複製嗶哩嗶哩、抖音、Telegram、Threads、微信公眾號、微博、Niconico、Instagram、小紅書、TikTok 或 X 的影片、貼文、圖文、混合媒體或文章連結"
                     },
                     {
                         "name": "貼上連結",
@@ -477,7 +539,7 @@
                     },
                     {
                         "name": "自動識別",
-                        "text": "工具會自動識別平台（嗶哩嗶哩/抖音/微信公眾號/Instagram/小紅書/TikTok/X）"
+                        "text": "工具會自動識別平台（嗶哩嗶哩/抖音/Telegram/Threads/微信公眾號/微博/Niconico/Instagram/小紅書/TikTok/X）"
                     },
                     {
                         "name": "下載",
@@ -487,7 +549,7 @@
                 "ja": [
                     {
                         "name": "リンクをコピー",
-                        "text": "Bilibili、Douyin、WeChat、Niconico、Instagram、Xiaohongshu、TikTok、または X の動画・投稿・画像投稿・記事リンクをコピーします"
+                        "text": "Bilibili、Douyin、Telegram、Threads、WeChat、Weibo、Niconico、Instagram、Xiaohongshu、TikTok、または X の動画・投稿・画像投稿・混合メディア投稿・記事リンクをコピーします"
                     },
                     {
                         "name": "リンクを貼り付け",
@@ -495,7 +557,7 @@
                     },
                     {
                         "name": "自動判別",
-                        "text": "ツールがプラットフォームを自動で判別します（Bilibili / Douyin / WeChat / Niconico / Instagram / Xiaohongshu / TikTok / X）"
+                        "text": "ツールがプラットフォームを自動で判別します（Bilibili / Douyin / Telegram / Threads / WeChat / Weibo / Niconico / Instagram / Xiaohongshu / TikTok / X）"
                     },
                     {
                         "name": "ダウンロード",
@@ -530,7 +592,10 @@
         "viewLargeImage": "拡大画像を表示",
         "imageLoadingProgress": "読み込み中 {loaded}/{total}",
         "imageAutoLoadedTip": "💡 画像は自動で読み込まれました。クリックしてダウンロードできます",
-        "packagingProgress": "画像 {current}/{total} をパッケージ化中"
+        "packagingProgress": "画像 {current}/{total} をパッケージ化中",
+        "videoList": "動画一覧",
+        "videoCount": "{count} 件の動画",
+        "pureMusicHint": "このコンテンツは純粋な音声・音楽です。音声ファイルを直接ダウンロードできます。"
     },
     "changelog": {
         "title": "更新履歴"

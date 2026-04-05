@@ -2,10 +2,13 @@ import type {ApiErrorCode} from '@/lib/types'
 
 export interface ResultDict {
     title: string;
+    videoList: string;
+    videoCount: string;
     downloadVideo: string;
     mergeDownloadVideo: string;
     mergeDownloadVideoHint: string;
     downloadAudio: string;
+    pureMusicHint: string;
     originDownloadVideo: string;
     originDownloadAudio: string;
     totalParts: string;
@@ -114,8 +117,10 @@ export interface Dictionary {
             bilibiliTv: string;
             douyin: string;
             telegram: string;
+            threads: string;
             wechat: string;
             niconico: string;
+            weibo: string;
             xiaohongshu: string;
             tiktok: string;
             instagram: string;
@@ -250,6 +255,12 @@ export interface Dictionary {
                 features?: string[];
                 limitations?: string[];
             };
+            threads: {
+                name: string;
+                summary: string;
+                features?: string[];
+                limitations?: string[];
+            };
             wechat: {
                 name: string;
                 summary: string;
@@ -257,6 +268,12 @@ export interface Dictionary {
                 limitations?: string[];
             };
             niconico: {
+                name: string;
+                summary: string;
+                features?: string[];
+                limitations?: string[];
+            };
+            weibo: {
                 name: string;
                 summary: string;
                 features?: string[];

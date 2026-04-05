@@ -13,6 +13,7 @@ import {
     getResultMediaActions,
     shouldHideSingleImagePreview,
     shouldShowVideoDownloadButton,
+    shouldUseFrontendImageProxy,
 } from "./result-card-visibility";
 
 interface ResultCardProps {
@@ -22,14 +23,14 @@ interface ResultCardProps {
 }
 
 function resolveCoverSrc(coverUrl: string): string {
-    if (coverUrl.startsWith('http://') || coverUrl.startsWith('https://')) {
+    if (shouldUseFrontendImageProxy(coverUrl)) {
         return `/api/proxy-image?url=${encodeURIComponent(coverUrl)}`;
     }
     return coverUrl;
 }
 
 function resolveImageSrc(imageUrl: string): string {
-    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+    if (shouldUseFrontendImageProxy(imageUrl)) {
         return `/api/proxy-image?url=${encodeURIComponent(imageUrl)}`;
     }
     return imageUrl;
@@ -56,6 +57,7 @@ export function ResultCard({ result, onClose, onOpenExtractAudio }: ResultCardPr
     const isMultiPart = result.isMultiPart && result.pages && result.pages.length > 1;
     const isImageNote = result.noteType === 'image' && !!result.images?.length;
     const hasEmbeddedVideos = !!result.videos?.length;
+    const hasSupplementalImages = !isImageNote && !!result.images?.length;
     const coverUrl = typeof result.cover === 'string' ? result.cover.trim() : '';
     const shouldShowCover = !isImageNote && coverUrl.length > 0;
     const coverSrc = shouldShowCover ? resolveCoverSrc(coverUrl) : '';
@@ -96,15 +98,26 @@ export function ResultCard({ result, onClose, onOpenExtractAudio }: ResultCardPr
                             title={displayTitle}
                             platform={result.platform}
                         />
-                    ) : isMultiPart ? (
-                        <MultiPartList
-                            pages={result.pages!}
-                            currentPage={result.currentPage}
-                        />
-                    ) : hasEmbeddedVideos ? (
-                        <EmbeddedVideoList videos={result.videos!} />
                     ) : (
-                        <SinglePartButtons result={result} onOpenExtractAudio={onOpenExtractAudio} />
+                        <>
+                            {isMultiPart ? (
+                                <MultiPartList
+                                    pages={result.pages!}
+                                    currentPage={result.currentPage}
+                                />
+                            ) : hasEmbeddedVideos ? (
+                                <EmbeddedVideoList videos={result.videos!} />
+                            ) : (
+                                <SinglePartButtons result={result} onOpenExtractAudio={onOpenExtractAudio} />
+                            )}
+                            {hasSupplementalImages && (
+                                <ImageNoteGrid
+                                    images={result.images!}
+                                    title={displayTitle}
+                                    platform={result.platform}
+                                />
+                            )}
+                        </>
                     )}
                 </div>
             </CardContent>
@@ -128,7 +141,7 @@ function SinglePartButtons({
     const videoDownloadUrl = result.downloadVideoUrl || result.originDownloadVideoUrl;
     const audioDownloadUrl = result.downloadAudioUrl || result.originDownloadAudioUrl || null;
     const { videoAction, audioAction } = getResultMediaActions({
-        videoAudioMode: result.videoAudioMode,
+        mediaActions: result.mediaActions,
         videoDownloadUrl,
         audioDownloadUrl,
     });
@@ -156,13 +169,14 @@ function SinglePartButtons({
             sourceUrl: result.url || null,
             audioUrl: audioDownloadUrl,
             videoUrl: videoDownloadUrl || null,
-            videoAudioMode: result.videoAudioMode,
+            mediaActions: result.mediaActions,
         });
     };
+    const actionCount = Number(showVideoDownload) + Number(showAudioDownload);
 
     return (
         <>
-            <div className="grid grid-cols-2 gap-2">
+            <div className={`grid gap-2 ${actionCount > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
                 {showVideoDownload && (
                     <Button
                         variant="outline"
@@ -209,6 +223,11 @@ function SinglePartButtons({
             {videoAction === 'merge-then-download' && (
                 <p className="text-xs text-muted-foreground">
                     {dict.result.mergeDownloadVideoHint}
+                </p>
+            )}
+            {result.noteType === 'audio' && (
+                <p className="text-xs text-muted-foreground">
+                    {dict.result.pureMusicHint}
                 </p>
             )}
             {(showOriginVideoLink || showOriginAudioLink) && (
@@ -343,9 +362,9 @@ function EmbeddedVideoList({ videos }: { videos: EmbeddedVideoInfo[] }) {
     return (
         <div className="space-y-2">
             <div className="text-sm text-foreground/75">
-                <span>{dict.result.articleVideoList}</span>
+                <span>{dict.result.videoList}</span>
                 <span className="ml-2">
-                    {replaceTemplate(dict.result.articleVideoCount, '{count}', String(videos.length))}
+                    {replaceTemplate(dict.result.videoCount, '{count}', String(videos.length))}
                 </span>
             </div>
             <div className="max-h-[300px] overflow-y-auto space-y-2 pr-1">

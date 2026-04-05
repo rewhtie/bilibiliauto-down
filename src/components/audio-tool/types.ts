@@ -1,4 +1,4 @@
-import type { VideoAudioMode } from '@/lib/types'
+import type { MediaActions } from '@/lib/types'
 
 export type ResultTaskAction = 'extract-audio' | 'merge-video'
 
@@ -8,7 +8,7 @@ export interface AudioExtractTask {
     sourceUrl?: string | null
     audioUrl?: string | null
     videoUrl?: string | null
-    videoAudioMode?: VideoAudioMode
+    mediaActions?: MediaActions
 }
 
 export type ExtractMode = 'file' | 'merge'

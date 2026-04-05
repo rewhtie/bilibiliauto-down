@@ -1,4 +1,6 @@
+import Image from 'next/image';
 import type { Dictionary } from '@/lib/i18n/types';
+import { cn } from '@/lib/utils';
 import { getPlatformSupportItems } from './platform-support';
 
 interface PlatformSupportGridProps {
@@ -9,37 +11,81 @@ export function PlatformSupportGrid({ dict }: PlatformSupportGridProps) {
     const items = getPlatformSupportItems(dict);
 
     return (
-        <div className="space-y-2">
-            <div className="space-y-0.5">
+        <div className="space-y-1">
+            <div className="grid grid-cols-2 gap-x-3 gap-y-1">
                 {items.map((item) => (
                     <div
                         key={item.key}
-                        className="flex items-center gap-2 border-b border-border/50 py-1 last:border-b-0"
+                        className="flex items-center gap-2 rounded-lg px-0.5 py-1"
                     >
-                        <span
-                            aria-hidden
-                            className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500"
-                        />
-                        <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
-                            <p className="shrink-0 text-sm font-medium leading-5">
+                        <div
+                            className={cn(
+                                'relative flex h-7 w-7 shrink-0 items-center justify-center rounded-md border',
+                                item.visual.frameClassName,
+                            )}
+                        >
+                            {item.visual.darkSrc ? (
+                                <>
+                                    <Image
+                                        src={item.visual.src}
+                                        alt=""
+                                        aria-hidden
+                                        width={14}
+                                        height={14}
+                                        unoptimized
+                                        className={cn(
+                                            'h-3.5 w-3.5 object-contain dark:hidden',
+                                            item.visual.iconClassName,
+                                        )}
+                                    />
+                                    <Image
+                                        src={item.visual.darkSrc}
+                                        alt=""
+                                        aria-hidden
+                                        width={14}
+                                        height={14}
+                                        unoptimized
+                                        className={cn(
+                                            'hidden h-3.5 w-3.5 object-contain dark:block',
+                                            item.visual.iconClassName,
+                                        )}
+                                    />
+                                </>
+                            ) : (
+                                <Image
+                                    src={item.visual.src}
+                                    alt=""
+                                    aria-hidden
+                                    width={14}
+                                    height={14}
+                                    unoptimized
+                                    className={cn(
+                                        'h-3.5 w-3.5 object-contain',
+                                        item.visual.iconClassName,
+                                    )}
+                                />
+                            )}
+                            {item.visual.badgeLabel ? (
+                                <span
+                                    className={cn(
+                                        'absolute -right-1 -top-1 rounded-full px-1 py-0.5 text-[7px] font-semibold leading-none shadow-sm',
+                                        item.visual.badgeClassName,
+                                    )}
+                                >
+                                    {item.visual.badgeLabel}
+                                </span>
+                            ) : null}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                            <p className="text-[14px] font-semibold leading-4 text-foreground">
                                 {item.name}
                             </p>
-                            <div className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto whitespace-nowrap pb-0.5">
-                                {item.features.map((feature) => (
-                                    <span
-                                        key={`${item.key}-${feature}`}
-                                        className="inline-flex shrink-0 items-center rounded border border-border/50 px-1.5 py-0.5 text-xs leading-4 text-muted-foreground"
-                                    >
-                                        {feature}
-                                    </span>
-                                ))}
-                            </div>
                         </div>
                     </div>
                 ))}
             </div>
 
-            <div className="pt-1 text-center text-[11px] text-muted-foreground">
+            <div className="pt-0.5 text-center text-[10px] text-muted-foreground">
                 {dict.guide.platformSupport.comingSoon}
             </div>
         </div>

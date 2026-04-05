@@ -22,7 +22,13 @@ export const API_ERROR_CODES = [
 
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number]
 export type ApiErrorDetails = Record<string, unknown>
-export type VideoAudioMode = 'muxed' | 'separate' | 'not_applicable'
+export type VideoMediaAction = 'direct-download' | 'merge-then-download' | 'hide'
+export type AudioMediaAction = 'direct-download' | 'extract-audio' | 'hide'
+
+export interface MediaActions {
+    video: VideoMediaAction;
+    audio: AudioMediaAction;
+}
 
 /**
  * 多P视频的单个分P信息
@@ -52,6 +58,7 @@ export interface EmbeddedVideoInfo {
     qualityOptions?: VideoQualityOption[];
     downloadVideoUrl?: string | null;
     originDownloadVideoUrl?: string | null;
+    mediaActions?: MediaActions;
 }
 
 export interface UnifiedParseResult {
@@ -69,7 +76,7 @@ export interface UnifiedParseResult {
         downloadVideoUrl: string | null;
         originDownloadAudioUrl?: string | null;
         originDownloadVideoUrl: string | null;
-        videoAudioMode?: VideoAudioMode;
+        mediaActions?: MediaActions;
         url: string;
         // 时长（秒）
         duration?: number;
@@ -78,7 +85,7 @@ export interface UnifiedParseResult {
         currentPage?: number;
         pages?: PageInfo[];
         // 小红书相关字段
-        noteType?: 'video' | 'image';
+        noteType?: 'video' | 'image' | 'audio';
         images?: string[];
         // 微信公众号文章视频列表
         videos?: EmbeddedVideoInfo[];
@@ -111,9 +118,11 @@ export type Platform =
     | 'bilibili_tv'
     | 'douyin'
     | 'telegram'
+    | 'threads'
     | 'wechat'
     | 'nico'
     | 'niconico'
+    | 'weibo'
     | 'xiaohongshu'
     | 'tiktok'
     | 'instagram'
