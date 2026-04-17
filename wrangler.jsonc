@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "galaxy-downloader",
+  "name": "bilibiliauto-down",
   "compatibility_date": "2026-03-17",
   "compatibility_flags": [
     "nodejs_compat"
